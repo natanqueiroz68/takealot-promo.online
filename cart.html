@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Shopping Cart | Takealot.com</title>
+  <style>
+    :root {
+      --primary-blue: #0b79bf;
+      --takealot-blue: #0b6ecb;
+      --takealot-green: #1c853f;
+      --takealot-green-hover: #177336;
+      --takealot-pink: #f65268;
+      --text-dark: #2c2c2c;
+      --text-muted: #666666;
+      --text-subtle: #4b5563;
+      --border-color: #e5e7eb;
+      --bg-gray: #f3f4f6;
+      --bg-light-blue: #eef6fd;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #f4f5f7;
+      color: var(--text-dark);
+      line-height: 1.4;
+      padding-bottom: calc(115px + env(safe-area-inset-bottom, 12px));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .cart-wrap {
+      max-width: 540px;
+      margin: 0 auto;
+      background: #ffffff;
+      min-height: 100vh;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.04);
+      position: relative;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      font-family: inherit;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 54px;
+      padding: 0 14px;
+      max-width: 540px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .header__left {
+      display: flex;
+      align-items: center;
+      width: 40px;
+    }
+
+    .hamburger-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      color: #2c2c2c;
+    }
+
+    .header__center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      height: 24px;
+      width: auto;
+      display: block;
+    }
+
+    .header__right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 64px;
+      justify-content: flex-end;
+    }
+
+    .header-icon-btn {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2c2c2c;
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -3px;
+      right: -4px;
+      background: var(--takealot-blue);
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 700;
+      min-width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 2px;
+    }
+
+    /* ===== LOCATION BAR ===== */
+    .location-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 13.5px;
+    }
+
+    .location-bar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dark);
+    }
+
+    .location-pin-icon {
+      width: 18px;
+      height: 18px;
+      color: #2c2c2c;
+      flex-shrink: 0;
+    }
+
+    .location-bar__action {
+      color: var(--takealot-blue);
+      font-weight: 600;
+      font-size: 13.5px;
+    }
+
+    /* ===== PAGE TITLE STRIP ===== */
+    .page-title-strip {
+      background: #f1f3f6;
+      padding: 13px 16px;
+      border-bottom: 1px solid #e2e6ea;
+    }
+
+    .page-title {
+      font-size: 17.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.2px;
+    }
+
+    /* ===== TAKEALOT MORE BANNER ===== */
+    .more-banner {
+      background: #ffffff;
+      padding: 16px 16px 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .more-banner__brand {
+      display: flex;
+      align-items: baseline;
+      gap: 1px;
+      margin-bottom: 8px;
+    }
+
+    .brand-takealot {
+      font-size: 21px;
+      font-weight: 800;
+      color: #1a202c;
+      letter-spacing: -0.6px;
+    }
+
+    .brand-more {
+      font-size: 21px;
+      font-weight: 700;
+      font-style: italic;
+      color: #f65268;
+      font-family: cursive, sans-serif;
+    }
+
+    .more-banner__text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2c2c2c;
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+
+    .more-banner__action {
+      display: block;
+      text-align: right;
+    }
+
+    .more-trial-link {
+      color: var(--takealot-blue);
+      font-size: 14.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* ===== SECTION DIVIDER ===== */
+    .section-divider {
+      height: 8px;
+      background: #f0f2f5;
+      border-top: 1px solid #e4e7eb;
+      border-bottom: 1px solid #e4e7eb;
+    }
+
+    /* ===== CART ITEM CARD ===== */
+    .cart-item {
+      background: #ffffff;
+      padding: 16px;
+    }
+
+    .cart-item__main {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .cart-item__thumb-box {
+      width: 86px;
+      height: 86px;
+      flex-shrink: 0;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cart-item__thumb {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .cart-item__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cart-item__title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .cart-item__price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #000000;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .cart-item__sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    .cart-item__shipping {
+      font-size: 13px;
+      color: #d9383a;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .cart-item__delivery {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .calendar-icon {
+      width: 18px;
+      height: 18px;
+      color: #374151;
+      flex-shrink: 0;
+    }
+
+    /* PROMO APPLIED TAG */
+    .cart-item__promo {
+      margin-top: 14px;
+      margin-bottom: 12px;
+    }
+
+    .promo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-light-blue);
+      color: var(--takealot-blue);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+
+    .tag-icon {
+      width: 14px;
+      height: 14px;
+      color: var(--takealot-blue);
+    }
+
+    /* ACTIONS ROW (Trash, Wishlist, Qty) */
+    .cart-item__actions-divider {
+      border-top: 1px dashed #e2e8f0;
+      margin: 12px 0 14px;
+    }
+
+    .cart-item__actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .item-icon-btn {
+      width: 44px;
+      height: 42px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #374151;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .item-icon-btn:hover {
+      background: #f9fafb;
+    }
+
+    .item-icon-btn:active {
+      transform: scale(0.96);
+    }
+
+    .trash-ico,
+    .wish-ico {
+      width: 18px;
+      height: 18px;
+    }
+
+    .qty-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 160px;
+    }
+
+    .qty-select {
+      width: 100%;
+      height: 42px;
+      border: 1px solid #9ca3af;
+      border-radius: 6px;
+      background: #ffffff;
+      padding: 0 32px 0 14px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text-dark);
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .qty-select:focus {
+      outline: none;
+      border-color: var(--takealot-blue);
+    }
+
+    .qty-chevron {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #4b5563;
+      pointer-events: none;
+    }
+
+    /* ===== DISCLAIMER NOTICE BOX ===== */
+    .disclaimer-box {
+      background: #f4f5f7;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 16px;
+      font-size: 12.8px;
+      color: var(--text-subtle);
+      line-height: 1.45;
+    }
+
+    /* ===== TAKEALOT CREDIT BANNER ===== */
+    .credit-banner {
+      background: #0073e6;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #ffffff;
+    }
+
+    .credit-banner__left {
+      flex: 1;
+    }
+
+    .credit-banner__logo {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .credit-banner__sub {
+      font-size: 14.5px;
+      font-weight: 400;
+      opacity: 0.95;
+      margin-top: 2px;
+    }
+
+    .credit-banner__terms {
+      font-size: 9.5px;
+      opacity: 0.8;
+      margin-top: 8px;
+      line-height: 1.2;
+    }
+
+    .credit-banner__badge {
+      background: rgba(0, 30, 75, 0.45);
+      border-radius: 6px;
+      padding: 6px 12px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .badge-percent {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .badge-sub {
+      font-size: 10px;
+      opacity: 0.9;
+      line-height: 1.2;
+    }
+
+    /* ===== CUSTOMERS ALSO BOUGHT ===== */
+    .also-bought {
+      background: #ffffff;
+      padding-top: 16px;
+    }
+
+    .also-bought__title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+      padding: 0 16px 12px;
+    }
+
+    .also-bought__scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 0 16px 20px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .also-bought__scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .rec-card {
+      flex: 0 0 150px;
+      width: 150px;
+      border: 1px solid #edf0f3;
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .rec-img-box {
+      width: 100%;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .rec-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .rec-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #2c2c2c;
+      line-height: 1.3;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .rec-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 8px;
+    }
+
+    .rec-add-btn {
+      width: 100%;
+      height: 32px;
+      border-radius: 9999px;
+      background: #ffffff;
+      border: 1px solid var(--takealot-blue);
+      color: var(--takealot-blue);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .rec-add-btn:hover {
+      background: #f0f7ff;
+    }
+
+    /* ===== FIXED BOTTOM CHECKOUT BAR ===== */
+    .checkout-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      padding: 12px 16px max(12px, env(safe-area-inset-bottom, 12px));
+      z-index: 1000;
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .checkout-bar__content {
+      max-width: 540px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .checkout-bar__summary {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .checkout-total-label {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: 0.1px;
+    }
+
+    .checkout-total-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--takealot-green);
+      letter-spacing: -0.3px;
+    }
+
+    .checkout-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 48px;
+      background: var(--takealot-green);
+      color: #ffffff;
+      font-size: 16.5px;
+      font-weight: 700;
+      border-radius: 9999px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(28, 133, 63, 0.28);
+      transition: background-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .checkout-btn:hover {
+      background: var(--takealot-green-hover);
+    }
+
+    .checkout-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* TOAST NOTIFICATION */
+    .cart-toast {
+      position: fixed;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(44, 44, 44, 0.95);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 2000;
+      white-space: nowrap;
+    }
+
+    .cart-toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ===== RESPONSIVIDADE COMPLETA PARA CELULARES ===== */
+    @media (max-width: 380px) {
+      .header {
+        padding: 0 10px;
+      }
+
+      .location-bar {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .location-bar__action {
+        font-size: 13px;
+      }
+
+      .page-title-strip {
+        padding: 11px 12px;
+      }
+
+      .page-title {
+        font-size: 16px;
+      }
+
+      .more-banner {
+        padding: 12px 12px;
+      }
+
+      .brand-takealot,
+      .brand-more {
+        font-size: 19px;
+      }
+
+      .more-banner__text {
+        font-size: 13.5px;
+      }
+
+      .cart-item {
+        padding: 14px 12px;
+      }
+
+      .cart-item__main {
+        gap: 12px;
+      }
+
+      .cart-item__thumb-box {
+        width: 76px;
+        height: 76px;
+      }
+
+      .cart-item__title {
+        font-size: 13.5px;
+      }
+
+      .cart-item__price {
+        font-size: 17px;
+      }
+
+      .cart-item__sub {
+        font-size: 12.5px;
+      }
+
+      .cart-item__shipping {
+        font-size: 12.5px;
+      }
+
+      .cart-item__delivery {
+        font-size: 13px;
+      }
+
+      .item-icon-btn {
+        width: 40px;
+        height: 40px;
+      }
+
+      .trash-ico,
+      .wish-ico {
+        width: 16px;
+        height: 16px;
+      }
+
+      .qty-select {
+        height: 40px;
+        font-size: 13.5px;
+        padding: 0 28px 0 10px;
+      }
+
+      .disclaimer-box {
+        padding: 12px 12px;
+        font-size: 12px;
+      }
+
+      .credit-banner {
+        padding: 12px 12px;
+        gap: 10px;
+      }
+
+      .credit-banner__logo {
+        font-size: 18px;
+      }
+
+      .credit-banner__sub {
+        font-size: 13.5px;
+      }
+
+      .credit-banner__badge {
+        padding: 5px 8px;
+      }
+
+      .badge-percent {
+        font-size: 11px;
+      }
+
+      .badge-sub {
+        font-size: 9.5px;
+      }
+
+      .also-bought__title {
+        font-size: 15px;
+        padding: 0 12px 10px;
+      }
+
+      .also-bought__scroll {
+        padding: 0 12px 16px;
+        gap: 10px;
+      }
+
+      .rec-card {
+        flex: 0 0 138px;
+        width: 138px;
+        padding: 8px;
+      }
+
+      .rec-img-box {
+        height: 98px;
+      }
+
+      .rec-name {
+        font-size: 12px;
+      }
+
+      .checkout-bar {
+        padding: 10px 12px max(10px, env(safe-area-inset-bottom, 10px));
+      }
+
+      .checkout-btn {
+        height: 45px;
+        font-size: 15.5px;
+      }
+
+      .checkout-total-price {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 335px) {
+      .header {
+        padding: 0 8px;
+      }
+
+      .hamburger-btn {
+        width: 32px;
+        height: 32px;
+      }
+
+      .logo-img {
+        height: 21px;
+      }
+
+      .header__right {
+        width: 56px;
+        gap: 4px;
+      }
+
+      .header-icon-btn {
+        width: 28px;
+        height: 28px;
+      }
+
+      .location-bar {
+        padding: 8px 8px;
+        font-size: 12px;
+      }
+
+      .location-bar__action {
+        font-size: 12.5px;
+      }
+
+      .page-title-strip {
+        padding: 8px 10px;
+      }
+
+      .page-title {
+        font-size: 15px;
+      }
+
+      .more-banner {
+        padding: 10px 8px;
+      }
+
+      .brand-takealot,
+      .brand-more {
+        font-size: 17px;
+      }
+
+      .more-banner__text {
+        font-size: 12.5px;
+      }
+
+      .more-trial-link {
+        font-size: 13px;
+      }
+
+      .cart-item {
+        padding: 12px 8px;
+      }
+
+      .cart-item__main {
+        gap: 8px;
+      }
+
+      .cart-item__thumb-box {
+        width: 66px;
+        height: 66px;
+      }
+
+      .cart-item__title {
+        font-size: 12.5px;
+        line-height: 1.3;
+      }
+
+      .cart-item__price {
+        font-size: 15.5px;
+      }
+
+      .cart-item__sub {
+        font-size: 11.5px;
+      }
+
+      .cart-item__shipping {
+        font-size: 11.5px;
+      }
+
+      .cart-item__delivery {
+        font-size: 12px;
+      }
+
+      .calendar-icon {
+        width: 15px;
+        height: 15px;
+      }
+
+      .promo-badge {
+        font-size: 11.5px;
+        padding: 4px 6px;
+      }
+
+      .cart-item__actions {
+        gap: 6px;
+      }
+
+      .item-icon-btn {
+        width: 35px;
+        height: 36px;
+      }
+
+      .trash-ico,
+      .wish-ico {
+        width: 15px;
+        height: 15px;
+      }
+
+      .qty-wrapper {
+        max-width: 130px;
+      }
+
+      .qty-select {
+        height: 36px;
+        font-size: 12.5px;
+        padding: 0 20px 0 8px;
+      }
+
+      .disclaimer-box {
+        padding: 10px 8px;
+        font-size: 11.5px;
+      }
+
+      .credit-banner {
+        padding: 10px 8px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .credit-banner__badge {
+        align-self: flex-start;
+      }
+
+      .also-bought__title {
+        padding: 0 8px 8px;
+        font-size: 14px;
+      }
+
+      .also-bought__scroll {
+        padding: 0 8px 12px;
+        gap: 8px;
+      }
+
+      .rec-card {
+        flex: 0 0 120px;
+        width: 120px;
+        padding: 6px;
+      }
+
+      .rec-img-box {
+        height: 80px;
+      }
+
+      .checkout-bar {
+        padding: 8px 8px max(8px, env(safe-area-inset-bottom, 8px));
+      }
+
+      .checkout-btn {
+        height: 42px;
+        font-size: 14.5px;
+      }
+
+      .checkout-total-price {
+        font-size: 18px;
+      }
+
+      .checkout-total-label {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="cart-wrap">
+    <!-- HEADER -->
+    <header class="header" aria-label="Takealot header">
+    <div class="header__left">
+      <a href="index.html" class="hamburger-btn" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </a>
+    </div>
+
+    <div class="header__center">
+      <a href="index.html" class="logo-link" aria-label="Go to homepage">
+        <img src="logo-takealot.svg" alt="takealot.com" class="logo-img" />
+      </a>
+    </div>
+
+    <div class="header__right">
+      <button class="header-icon-btn" aria-label="Search" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="M20 20l-3.2-3.2"></path>
+        </svg>
+      </button>
+
+      <button class="header-icon-btn" aria-label="Cart" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+        </svg>
+        <span class="cart-badge" id="headerCartCount">1</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- PAGE TITLE STRIP -->
+  <div class="page-title-strip">
+    <h1 class="page-title">Shopping Cart</h1>
+  </div>
+
+  <!-- TAKEALOT MORE PROMO BANNER -->
+  <div class="more-banner">
+    <div class="more-banner__brand">
+      <span class="brand-takealot">takealot</span><span class="brand-more">more</span>
+    </div>
+    <div class="more-banner__text">
+      Get FAST, FREE Delivery with TakealotMORE Premium. No order minimums.
+    </div>
+    <div class="more-banner__action">
+      <a href="#" class="more-trial-link">Start FREE Trial</a>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="section-divider"></div>
+
+  <!-- SHOPPING CART ITEM -->
+  <div class="cart-item" id="cartItemWrapper">
+    <div class="cart-item__main">
+      <div class="cart-item__thumb-box">
+        <img id="cartItemImg" class="cart-item__thumb" src="https://media.takealot.com/covers_images/f25083c50eee4bf1a854dadfa44c8e7f/s-zoom.file" alt="Berlinger Haus Cookware Set" />
+      </div>
+
+      <div class="cart-item__info">
+        <div class="cart-item__title" id="cartItemTitle">Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set - Antracit</div>
+        <div class="cart-item__price" id="cartItemUnitPrice">R 97</div>
+        <div class="cart-item__sub">Berlinger Haus 15-Piece Titan Pro Non-Stick Coating Cookware Set</div>
+        <div class="cart-item__shipping">Ships in 5 - 7 work days</div>
+        <div class="cart-item__delivery">
+          <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span id="cartDeliveryRange">Delivery 10 Oct - 15 Oct</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROMOTION APPLIED BADGE -->
+    <div class="cart-item__promo">
+      <span class="promo-badge">
+        <svg class="tag-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z" />
+        </svg>
+        Promotion Applied: Deals We Love
+      </span>
+    </div>
+
+    <!-- ACTIONS ROW (Delete, Wishlist, Qty) -->
+    <div class="cart-item__actions-divider"></div>
+    <div class="cart-item__actions">
+      <button class="item-icon-btn" id="deleteBtn" aria-label="Remove item" title="Remove item" type="button">
+        <svg class="trash-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </button>
+
+      <button class="item-icon-btn" id="wishlistBtn" aria-label="Move to Wishlist" title="Move to Wishlist" type="button">
+        <svg class="wish-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          <polyline points="12 9 15 12 12 15"></polyline>
+        </svg>
+      </button>
+
+      <div class="qty-wrapper">
+        <select class="qty-select" id="qtySelect" aria-label="Quantity">
+          <option value="1" selected>Qty: 1</option>
+          <option value="2">Qty: 2</option>
+          <option value="3">Qty: 3</option>
+          <option value="4">Qty: 4</option>
+          <option value="5">Qty: 5</option>
+          <option value="6">Qty: 6</option>
+          <option value="7">Qty: 7</option>
+          <option value="8">Qty: 8</option>
+        </select>
+        <svg class="qty-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER NOTICE BOX -->
+  <div class="disclaimer-box">
+    Placing an item in your shopping cart does not reserve that item or price. We only reserve stock for your order once payment is received. Delivery dates shown are estimates and will be confirmed at checkout.
+  </div>
+
+  <!-- TAKEALOT CREDIT BANNER -->
+  <div class="credit-banner">
+    <div class="credit-banner__left">
+      <div class="credit-banner__logo">takealot.credit</div>
+      <div class="credit-banner__sub">shop now, pay later</div>
+      <div class="credit-banner__terms">*T&amp;C's apply. 1% paid out quarterly. NCRCP38/FSP44481</div>
+    </div>
+    <div class="credit-banner__badge">
+      <div class="badge-percent">Plus, get 1%</div>
+      <div class="badge-sub">of your purchase back*</div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS ALSO BOUGHT -->
+  <section class="also-bought" aria-label="Customers also bought">
+    <h2 class="also-bought__title">Customers also bought</h2>
+    <div class="also-bought__scroll">
+
+      <!-- Item 1 -->
+      <div class="rec-card">
+        <div class="rec-img-box">
+          <img src="https://media.takealot.com/covers_images/30bda954019f40e2a4e4eac4c76657f7/s-zoom.file" alt="Berlinger Haus 6-Piece Knife Set" class="rec-img" />
+        </div>
+        <div class="rec-name">Berlinger Haus 6-Piece Non-Stick Knife Set</div>
+        <div class="rec-price">R 499</div>
+        <button class="rec-add-btn" type="button" onclick="showToast('Knife Set added to cart')">+ Add to Cart</button>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="rec-card">
+        <div class="rec-img-box">
+          <img src="https://media.takealot.com/covers_images/f0c895fd411f45b2804b3c74791f6707/s-zoom.file" alt="Berlinger Haus Kitchen Silicone Tools Set" class="rec-img" />
+        </div>
+        <div class="rec-name">Silicone Cooking Utensils Set with Stand - 7 Piece</div>
+        <div class="rec-price">R 279</div>
+        <button class="rec-add-btn" type="button" onclick="showToast('Utensils added to cart')">+ Add to Cart</button>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="rec-card">
+        <div class="rec-img-box">
+          <img src="https://media.takealot.com/covers_images/d8e0c633511e4ee88dfed73b25cd1631/s-zoom.file" alt="Berlinger Haus 28cm Deep Frypan" class="rec-img" />
+        </div>
+        <div class="rec-name">Berlinger Haus 28cm Titan Pro Deep Frying Pan</div>
+        <div class="rec-price">R 549</div>
+        <button class="rec-add-btn" type="button" onclick="showToast('Frying pan added to cart')">+ Add to Cart</button>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="rec-card">
+        <div class="rec-img-box">
+          <img src="https://media.takealot.com/covers_images/5a9ac53f42f841b9a1c4afa001cbbedc/s-zoom.file" alt="Berlinger Haus Stainless Steel Trivets" class="rec-img" />
+        </div>
+        <div class="rec-name">Heat Resistant Silicone Kitchen Trivet Mats - Pack of 2</div>
+        <div class="rec-price">R 169</div>
+        <button class="rec-add-btn" type="button" onclick="showToast('Trivet mats added to cart')">+ Add to Cart</button>
+      </div>
+
+    </div>
+  </section>
+  </div><!-- /.cart-wrap -->
+
+  <!-- FIXED BOTTOM CHECKOUT BAR -->
+  <footer class="checkout-bar" aria-label="Checkout actions">
+    <div class="checkout-bar__content">
+      <div class="checkout-bar__summary">
+        <span class="checkout-total-label">TOTAL: <span id="cartTotalItemsText">(1 item)</span></span>
+        <span class="checkout-total-price" id="cartTotalPrice">R 97</span>
+      </div>
+      <a href="https://paw-house.shop/p/dm-c53zv3u7et" class="checkout-btn" id="proceedBtn" target="_blank" rel="noopener noreferrer" onclick="localStorage.setItem('takealot_purchase_date', new Date().toISOString())">
+        Proceed to Checkout
+      </a>
+    </div>
+  </footer>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="cart-toast" id="cartToast"></div>
+
+  <script>
+    // Variantes de cores e preços sincronizados com a página do produto
+    const variantData = {
+      "Antracit": {
+        name: "Antracit",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/f25083c50eee4bf1a854dadfa44c8e7f/s-zoom.file"
+      },
+      "Black Rose": {
+        name: "Black Rose",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/5424cf30b14b4334b3f81e3a479ff705/s-zoom.file"
+      },
+      "Deep Sea": {
+        name: "Deep Sea",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/e8ef492d27c64606bf63eb4c7dcde092/s-zoom.file"
+      },
+      "Green": {
+        name: "Green",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/343c1ee1aa364cb0adba86dff77636e0/s-zoom.file"
+      },
+      "Leonardo": {
+        name: "Leonardo",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/2e0eaeb2f9fb462fa1128ee55160ba7c/s-zoom.file"
+      },
+      "Matt Black": {
+        name: "Matt Black",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/85c88b010f3c4c9fa3080e72bf80b8e6/s-zoom.file"
+      },
+      "Sahara": {
+        name: "Sahara",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/570195c866ba4737aa71c6ca495111b1/s-zoom.file"
+      },
+      "Taupe": {
+        name: "Taupe",
+        priceNumber: 97,
+        priceFormatted: "R 97",
+        img: "https://media.takealot.com/covers_images/5be4f6df851346168d4e050d860e073a/s-zoom.file"
+      }
+    };
+
+    // Detecta variante da URL ou localStorage
+    const params = new URLSearchParams(window.location.search);
+    const selectedVariantKey = params.get("variant") || localStorage.getItem("takealot_cart_variant") || "Antracit";
+    const currentVariant = variantData[selectedVariantKey] || variantData["Antracit"];
+
+    let currentQty = 1;
+    let unitPrice = currentVariant.priceNumber;
+
+    // Elementos DOM
+    const cartItemTitle = document.getElementById("cartItemTitle");
+    const cartItemUnitPrice = document.getElementById("cartItemUnitPrice");
+    const cartItemImg = document.getElementById("cartItemImg");
+    const cartTotalPrice = document.getElementById("cartTotalPrice");
+    const cartTotalItemsText = document.getElementById("cartTotalItemsText");
+    const headerCartCount = document.getElementById("headerCartCount");
+    const qtySelect = document.getElementById("qtySelect");
+    const deleteBtn = document.getElementById("deleteBtn");
+    const wishlistBtn = document.getElementById("wishlistBtn");
+    const cartItemWrapper = document.getElementById("cartItemWrapper");
+    const cartDeliveryRange = document.getElementById("cartDeliveryRange");
+
+    // Inicializa detalhes da variante no carrinho
+    if (cartItemTitle) {
+      cartItemTitle.textContent = `Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set - ${currentVariant.name}`;
+    }
+    if (cartItemUnitPrice) {
+      cartItemUnitPrice.textContent = currentVariant.priceFormatted;
+    }
+    if (cartItemImg) {
+      cartItemImg.src = currentVariant.img;
+      cartItemImg.alt = `Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set - ${currentVariant.name}`;
+    }
+
+    // Calcula data de entrega estimada dinâmica
+    function formatDeliveryRange() {
+      const now = new Date();
+      const start = new Date(now);
+      start.setDate(now.getDate() + 7);
+      const end = new Date(now);
+      end.setDate(now.getDate() + 12);
+
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const sDay = start.getDate();
+      const sMonth = months[start.getMonth()];
+      const eDay = end.getDate();
+      const eMonth = months[end.getMonth()];
+
+      if (sMonth === eMonth) {
+        return `Delivery ${sDay} ${sMonth} - ${eDay} ${eMonth}`;
+      } else {
+        return `Delivery ${sDay} ${sMonth} - ${eDay} ${eMonth}`;
+      }
+    }
+
+    if (cartDeliveryRange) {
+      // Deixa exatamente igual ao print ou dinâmico
+      cartDeliveryRange.textContent = "Delivery 10 Oct - 15 Oct";
+    }
+
+    function updateTotals() {
+      const totalAmount = unitPrice * currentQty;
+      const formattedTotal = "R " + totalAmount.toLocaleString("en-ZA");
+
+      if (cartTotalPrice) cartTotalPrice.textContent = formattedTotal;
+      if (cartTotalItemsText) {
+        cartTotalItemsText.textContent = `(${currentQty} ${currentQty === 1 ? 'item' : 'items'})`;
+      }
+      if (headerCartCount) headerCartCount.textContent = currentQty;
+    }
+
+    updateTotals();
+
+    // Listener para o seletor de quantidade
+    if (qtySelect) {
+      qtySelect.addEventListener("change", (e) => {
+        currentQty = parseInt(e.target.value, 10) || 1;
+        updateTotals();
+        showToast(`Quantity updated to ${currentQty}`);
+      });
+    }
+
+    // Botão de deletar item
+    if (deleteBtn && cartItemWrapper) {
+      deleteBtn.addEventListener("click", () => {
+        if (confirm("Remove this item from your shopping cart?")) {
+          cartItemWrapper.style.opacity = "0.4";
+          cartItemWrapper.style.pointerEvents = "none";
+          currentQty = 0;
+          if (cartTotalPrice) cartTotalPrice.textContent = "R 0";
+          if (cartTotalItemsText) cartTotalItemsText.textContent = "(0 items)";
+          if (headerCartCount) headerCartCount.textContent = "0";
+          showToast("Item removed from cart");
+        }
+      });
+    }
+
+    // Botão de mover para wishlist
+    if (wishlistBtn) {
+      wishlistBtn.addEventListener("click", () => {
+        showToast("Item moved to your Wishlist ❤️");
+      });
+    }
+
+    // Toast de notificação
+    function showToast(msg) {
+      const toast = document.getElementById("cartToast");
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add("is-visible");
+      setTimeout(() => {
+        toast.classList.remove("is-visible");
+      }, 2400);
+    }
+  </script>
+</body>
+
+</html>

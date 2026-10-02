@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Tracking | Takealot.com</title>
+
+  <style>
+    :root {
+      --primary-blue: #0b79bf;
+      --takealot-blue: #0b6ecb;
+      --takealot-green: #16a34a;
+      --text-dark: #111827;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --text-subtle: #4b5563;
+      --border-color: #e5e7eb;
+      --border-dashed: #d5d9df;
+      --bg-gray: #f2f2f4;
+      --banner-blue-bg: #eaf3fa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: #f2f2f4;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* CONTAINER PRINCIPAL MOBILE-FIRST (100% fiel às capturas do app Takealot) */
+    .tracking-wrap {
+      width: 100%;
+      max-width: 500px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 54px;
+      padding: 0 16px;
+    }
+
+    .header__left {
+      display: flex;
+      align-items: center;
+      width: 36px;
+    }
+
+    .hamburger-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      color: #1f2937;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .header__center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      height: 24px;
+      width: auto;
+      display: block;
+    }
+
+    .header__right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 68px;
+      justify-content: flex-end;
+    }
+
+    .header-icon-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1f2937;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 0;
+    }
+
+    /* ===== TRACKING TITLE STRIP ===== */
+    .tracking-title-strip {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tracking-heading {
+      font-size: 17px;
+      font-weight: 700;
+      color: #111827;
+      letter-spacing: -0.2px;
+    }
+
+    .view-all-orders-link {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--primary-blue);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .view-all-orders-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== ORDER & ESTIMATED COLLECTION CARD ===== */
+    .order-info-card {
+      padding: 16px 16px 14px;
+      background: #ffffff;
+    }
+
+    .order-sub-number {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 4px;
+    }
+
+    .collection-date-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      letter-spacing: -0.2px;
+      margin-bottom: 14px;
+      line-height: 1.25;
+    }
+
+    /* NOTE BOX (Caixa com borda pontilhada) */
+    .note-box {
+      border: 1px dashed var(--border-dashed);
+      border-radius: 3px;
+      background: #ffffff;
+      padding: 11px 13px;
+      font-size: 13.5px;
+      color: #374151;
+      line-height: 1.4;
+    }
+
+    /* ===== BANNER AZUL CLARO COM MINIATURA DO PRODUTO ===== */
+    .product-showcase-banner {
+      width: 100%;
+      background: linear-gradient(180deg, #edf5fb 0%, #e3eff8 100%);
+      padding: 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-thumb-card {
+      width: 82px;
+      height: 82px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+
+    .product-thumb-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* ===== STEPPER / TIMELINE VERTICAL (100% fiel à imagem enviada) ===== */
+    .stepper-section {
+      background: #ffffff;
+      padding: 38px 16px 36px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .stepper-container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Linha / Trilha contínua cinza claro com pontas arredondadas (#f4f4f4) */
+    .stepper-continuous-track {
+      position: absolute;
+      left: 119px;
+      top: 10px;
+      bottom: 22px;
+      width: 11px;
+      background: #f4f4f4;
+      border-radius: 9999px;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      min-height: 72px;
+      margin-bottom: 28px;
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+      align-items: flex-start;
+      min-height: auto;
+    }
+
+    /* Coluna 1: Data à esquerda */
+    .step-date-col {
+      width: 100px;
+      text-align: right;
+      padding-right: 18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #a0a0a0;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .step-item:last-child .step-date-col {
+      padding-top: 3px;
+    }
+
+    /* Coluna 2: Coluna do Nó / Indicador */
+    .step-node-col {
+      width: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .step-item:last-child .step-node-col {
+      padding-top: 2px;
+    }
+
+    /* Nó Ativo: Ícone de Cadeado (#0c77c3) idêntico ao Takealot */
+    .step-padlock-svg {
+      width: 22px;
+      height: 34px;
+      display: block;
+      filter: drop-shadow(0 1px 2px rgba(12, 119, 195, 0.25));
+    }
+
+    /* Nó Pendente: Círculo cinza (#d7d7d7) */
+    .step-node-circle-gray {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #d7d7d7;
+      display: block;
+      box-shadow: 0 0 0 2px #ffffff;
+    }
+
+    /* Coluna 3: Texto de Status à direita */
+    .step-content-col {
+      flex: 1;
+      padding-left: 18px;
+    }
+
+    .step-title-bold {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #3a3f47;
+      line-height: 1.25;
+      letter-spacing: -0.1px;
+    }
+
+    .step-title-green {
+      font-size: 14px;
+      font-weight: 800;
+      color: #28cc65;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      line-height: 1.35;
+    }
+
+    .step-pickup-sub {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #a0a0a0;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+      margin-top: 4px;
+    }
+
+    /* ===== AVISO DE RASTREAMENTO DETALHADO ===== */
+    .warehouse-notice-card {
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      background: #ffffff;
+      padding: 20px 24px;
+      text-align: center;
+    }
+
+    .warehouse-notice-text {
+      font-size: 13.5px;
+      color: #374151;
+      line-height: 1.45;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    /* ===== BANNER TAKEALOT NOW DELIVERED IN MINUTES ===== */
+    .promo-banner-section {
+      padding: 22px 16px 14px;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+    }
+
+    .promo-banner-box {
+      width: 100%;
+      max-width: 340px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      aspect-ratio: 320 / 100;
+      background: #0b79bf;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .promo-banner-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ===== NEED HELP LINK ===== */
+    .need-help-row {
+      background: #ffffff;
+      padding: 12px 16px 26px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .need-help-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary-blue);
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .need-help-link:hover {
+      text-decoration: underline;
+    }
+
+    .need-help-link svg {
+      width: 20px;
+      height: 20px;
+      fill: var(--primary-blue);
+    }
+
+    /* ===== DOWNLOAD OUR APPS ===== */
+    .download-apps-section {
+      background: #ffffff;
+      padding: 0 16px 22px;
+      text-align: center;
+    }
+
+    .download-apps-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 14px;
+    }
+
+    .app-badges-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .app-badge-btn {
+      background: #000000;
+      border-radius: 6px;
+      height: 38px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      color: #ffffff;
+      transition: opacity 0.15s ease;
+    }
+
+    .app-badge-btn:hover {
+      opacity: 0.9;
+    }
+
+    .app-badge-btn .store-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-badge-btn .badge-texts {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      line-height: 1.1;
+    }
+
+    .app-badge-btn .badge-sub {
+      font-size: 8px;
+      font-weight: 400;
+      color: #e5e7eb;
+      letter-spacing: 0.2px;
+    }
+
+    .app-badge-btn .badge-main {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.1px;
+    }
+
+    /* ===== FOLLOW US ===== */
+    .follow-us-section {
+      background: #ffffff;
+      padding: 4px 16px 28px;
+      text-align: center;
+    }
+
+    .follow-us-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 14px;
+    }
+
+    .social-icons-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .social-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      text-decoration: none;
+      transition: transform 0.15s ease;
+    }
+
+    .social-btn:active {
+      transform: scale(0.95);
+    }
+
+    .social-btn.facebook {
+      background: #1877f2;
+    }
+
+    .social-btn.x-twitter {
+      background: #000000;
+    }
+
+    .social-btn.instagram {
+      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    }
+
+    /* ===== FOOTER AZUL (TAKEALOT BLUE FOOTER COM FORMAS DE PAGAMENTO) ===== */
+    .takealot-blue-footer {
+      background: var(--primary-blue);
+      padding: 24px 16px 36px;
+      color: #ffffff;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    .payment-methods-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+
+    .payment-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .pay-brand {
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      opacity: 0.95;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .pay-brand svg {
+      height: 16px;
+      width: auto;
+      fill: currentColor;
+    }
+
+    .footer-copyright {
+      font-size: 12.5px;
+      color: #ffffff;
+      opacity: 0.9;
+      font-weight: 400;
+      letter-spacing: 0.1px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 360px) {
+      .app-badges-row {
+        gap: 6px;
+      }
+
+      .app-badge-btn {
+        padding: 0 8px;
+        height: 36px;
+      }
+
+      .payment-row {
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="tracking-wrap">
+
+    <!-- HEADER (Takealot Mobile) -->
+    <header class="header" aria-label="Takealot header">
+      <div class="header__left">
+        <a href="index.html" class="hamburger-btn" aria-label="Open menu">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </a>
+      </div>
+
+      <div class="header__center">
+        <a href="index.html" class="logo-link" aria-label="Go to homepage">
+          <img src="logo-takealot.svg" alt="takealot.com" class="logo-img" />
+        </a>
+      </div>
+
+      <div class="header__right">
+        <button class="header-icon-btn" aria-label="Search" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.2-3.2"></path>
+          </svg>
+        </button>
+
+        <a href="cart.html" class="header-icon-btn" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#222222">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+          </svg>
+        </a>
+      </div>
+    </header>
+
+    <!-- TRACKING TITLE STRIP -->
+    <div class="tracking-title-strip">
+      <h1 class="tracking-heading">Tracking</h1>
+      <a href="index.html" class="view-all-orders-link">View All Orders</a>
+    </div>
+
+    <!-- ORDER & ESTIMATED DELIVERY CARD -->
+    <section class="order-info-card" aria-label="Order summary status">
+      <div class="order-sub-number">Order #226126728</div>
+      <h2 class="collection-date-title">Estimated Delivery from Tue, 6 Oct 2026</h2>
+
+      <!-- NOTA PONTILHADA -->
+      <div class="note-box">
+        Note: We'll send you an SMS or email once your order is ready for delivery
+      </div>
+    </section>
+
+    <!-- SHOWCASE AZUL CLARO COM O PRODUTO -->
+    <div class="product-showcase-banner">
+      <div class="product-thumb-card">
+        <img id="trackingProductImg" class="product-thumb-img" src="produto.png" alt="Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set" onerror="this.src='https://media.takealot.com/covers_images/f25083c50eee4bf1a854dadfa44c8e7f/s-zoom.file'" />
+      </div>
+    </div>
+
+    <!-- TIMELINE / STEPPER DE RASTREAMENTO (100% fiel à imagem enviada) -->
+    <section class="stepper-section" aria-label="Order tracking timeline">
+      <div class="stepper-container">
+
+        <!-- Trilha contínua de fundo cinza claro -->
+        <div class="stepper-continuous-track"></div>
+
+        <!-- ETAPA 1: 2 OCT 2026 - ORDER PAID (ÍCONE DE CADEADO AZUL) -->
+        <div class="step-item">
+          <div class="step-date-col">2 OCT 2026</div>
+          <div class="step-node-col">
+            <svg class="step-padlock-svg" viewBox="0 0 22 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5.5 13.5V7.5C5.5 4.46243 7.96243 2 11 2C14.0376 2 16.5 4.46243 16.5 7.5V13.5" stroke="#0c77c3" stroke-width="3.2" stroke-linecap="round"/>
+              <circle cx="11" cy="22" r="10.5" fill="#0c77c3"/>
+            </svg>
+          </div>
+          <div class="step-content-col">
+            <div class="step-title-bold">Order paid</div>
+          </div>
+        </div>
+
+        <!-- ETAPA 2: 3 OCT 2026 - EXPECTED TO SHIP -->
+        <div class="step-item">
+          <div class="step-date-col">3 OCT 2026</div>
+          <div class="step-node-col">
+            <span class="step-node-circle-gray"></span>
+          </div>
+          <div class="step-content-col">
+            <div class="step-title-bold">Expected to ship</div>
+          </div>
+        </div>
+
+        <!-- ETAPA 3: 6 OCT 2026 - ESTIMATED DELIVERY (VERDE) -->
+        <div class="step-item">
+          <div class="step-date-col">6 OCT 2026</div>
+          <div class="step-node-col">
+            <span class="step-node-circle-gray"></span>
+          </div>
+          <div class="step-content-col">
+            <div class="step-title-green">ESTIMATED DELIVERY 6 OCTOBER<br>2026</div>
+            <div class="step-pickup-sub">PARKLANDS PICKUP POINT</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CARD DE INFORMAÇÃO DETALHADA -->
+    <div class="warehouse-notice-card">
+      <p class="warehouse-notice-text">
+        Detailed tracking will become available once your parcel has shipped from our warehouse.
+      </p>
+    </div>
+
+    <!-- BANNER TAKEALOT NOW DELIVERED IN MINUTES -->
+    <div class="promo-banner-section">
+      <div class="promo-banner-box">
+        <img src="banner.jpg" alt="takealotNOW Delivered in minutes* MR D" />
+      </div>
+    </div>
+
+    <!-- NEED HELP LINK -->
+    <div class="need-help-row">
+      <a href="https://www.takealot.com/help" target="_blank" rel="noopener" class="need-help-link">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/>
+          <path d="M11 5h2v6h-2zm0 8h2v2h-2z"/>
+        </svg>
+        <span>Need Help?</span>
+      </a>
+    </div>
+
+    <!-- DOWNLOAD OUR APPS -->
+    <section class="download-apps-section" aria-label="Download our apps">
+      <h3 class="download-apps-title">Download Our Apps</h3>
+
+      <div class="app-badges-row">
+        <!-- App Store -->
+        <a href="#" class="app-badge-btn" aria-label="Download on Apple App Store">
+          <span class="store-icon">
+            <svg width="16" height="16" viewBox="0 0 170 170" fill="#ffffff">
+              <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.04-7.67-7.81-11.96-14.34-5.77-8.8-10.15-18.71-13.13-29.74-2.98-11.03-4.48-21.68-4.48-31.95 0-14.88 3.73-27.18 11.19-36.9 7.46-9.72 16.92-14.7 28.38-14.94 4.57 0 9.78 1.19 15.63 3.58 5.85 2.39 9.53 3.65 11.04 3.77 1.21-.12 5.09-1.42 11.64-3.9 6.55-2.48 11.83-3.6 15.86-3.37 11.83.65 21.36 4.95 28.6 12.91-10.43 6.3-15.54 15.01-15.34 26.13.2 8.7 3.48 15.93 9.85 21.69 6.37 5.76 13.97 9.07 22.8 9.94-2.28 6.96-5.07 14.19-8.36 21.69zM119.22 31.78c0-7.39 2.66-14.4 7.98-21.03 5.32-6.63 11.92-10.75 19.8-12.36 1.09 7.82-1.36 15.03-7.34 21.63-5.98 6.6-12.78 10.51-20.44 11.76z"/>
+            </svg>
+          </span>
+          <span class="badge-texts">
+            <span class="badge-sub">Download on the</span>
+            <span class="badge-main">App Store</span>
+          </span>
+        </a>
+
+        <!-- Google Play -->
+        <a href="#" class="app-badge-btn" aria-label="Get it on Google Play">
+          <span class="store-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M3.6 1.8L13.8 12 3.6 22.2c-.4-.4-.6-1-.6-1.7V3.5c0-.7.2-1.3.6-1.7z"/>
+              <path fill="#FBBC04" d="M17.3 8.6L13.8 12l3.5 3.4 3.9-2.2c1.1-.6 1.1-1.7 0-2.3l-3.9-2.3z"/>
+              <path fill="#EA4335" d="M13.8 12L3.6 1.8c.6-.4 1.4-.4 2.2.1l11.5 6.7-3.5 3.4z"/>
+              <path fill="#34A853" d="M13.8 12l3.5 3.4-11.5 6.7c-.8.5-1.6.5-2.2.1L13.8 12z"/>
+            </svg>
+          </span>
+          <span class="badge-texts">
+            <span class="badge-sub">GET IT ON</span>
+            <span class="badge-main">Google Play</span>
+          </span>
+        </a>
+
+        <!-- AppGallery -->
+        <a href="#" class="app-badge-btn" aria-label="Explore it on AppGallery">
+          <span class="store-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#C7151C">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+            </svg>
+          </span>
+          <span class="badge-texts">
+            <span class="badge-sub">EXPLORE IT ON</span>
+            <span class="badge-main">AppGallery</span>
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <!-- FOLLOW US -->
+    <section class="follow-us-section" aria-label="Follow us on social media">
+      <h3 class="follow-us-title">Follow Us</h3>
+
+      <div class="social-icons-row">
+        <!-- Facebook -->
+        <a href="https://facebook.com/Takealot" target="_blank" rel="noopener" class="social-btn facebook" aria-label="Facebook">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+
+        <!-- X (Twitter) -->
+        <a href="https://x.com/TAKEALOT" target="_blank" rel="noopener" class="social-btn x-twitter" aria-label="X Twitter">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
+
+        <!-- Instagram -->
+        <a href="https://instagram.com/takealotcom" target="_blank" rel="noopener" class="social-btn instagram" aria-label="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- FOOTER AZUL COM BANDEIRAS DE PAGAMENTO -->
+    <footer class="takealot-blue-footer">
+      <div class="payment-methods-grid">
+        <div class="payment-row">
+          <span class="pay-brand" style="font-weight: 900; font-size: 15px; letter-spacing: 1px;">VISA</span>
+          <span class="pay-brand">
+            <svg viewBox="0 0 36 24" style="width: 26px; height: 18px;">
+              <circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.7)"/>
+              <circle cx="24" cy="12" r="10" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+          </span>
+          <span class="pay-brand" style="font-size: 11px; text-transform: uppercase;">AMERICAN EXPRESS</span>
+          <span class="pay-brand" style="font-size: 10.5px;">Diners Club</span>
+          <span class="pay-brand" style="font-size: 12px; font-weight: 800;">payfast&rsaquo;</span>
+          <span class="pay-brand" style="font-size: 12px; font-weight: 700;">ozow</span>
+        </div>
+
+        <div class="payment-row">
+          <span class="pay-brand" style="font-size: 12px;">eB <small style="font-size: 10px;">eBucks</small></span>
+          <span class="pay-brand" style="font-size: 11.5px; font-weight: 600;">mobicred</span>
+          <span class="pay-brand" style="font-size: 11.5px;">Discovery <b style="font-weight: 800;">MILES</b></span>
+          <span class="pay-brand" style="font-size: 11.5px; font-weight: 700;">payflex</span>
+          <span class="pay-brand" style="font-size: 11.5px; font-weight: 600;">PayJustNow.</span>
+        </div>
+      </div>
+
+      <div class="footer-copyright">
+        &copy; Takealot Online (Pty) Ltd.
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // Sincroniza a variante selecionada no localStorage, se houver
+    (function initTracking() {
+      try {
+        const variantImages = {
+          "Antracit": "https://media.takealot.com/covers_images/f25083c50eee4bf1a854dadfa44c8e7f/s-zoom.file",
+          "Black Rose": "https://media.takealot.com/covers_images/5424cf30b14b4334b3f81e3a479ff705/s-zoom.file",
+          "Deep Sea": "https://media.takealot.com/covers_images/e8ef492d27c64606bf63eb4c7dcde092/s-zoom.file",
+          "Green": "https://media.takealot.com/covers_images/343c1ee1aa364cb0adba86dff77636e0/s-zoom.file",
+          "Leonardo": "https://media.takealot.com/covers_images/2e0eaeb2f9fb462fa1128ee55160ba7c/s-zoom.file",
+          "Matt Black": "https://media.takealot.com/covers_images/85c88b010f3c4c9fa3080e72bf80b8e6/s-zoom.file",
+          "Sahara": "https://media.takealot.com/covers_images/570195c866ba4737aa71c6ca495111b1/s-zoom.file",
+          "Taupe": "https://media.takealot.com/covers_images/5be4f6df851346168d4e050d860e073a/s-zoom.file"
+        };
+        const savedVariant = localStorage.getItem("takealot_cart_variant");
+        if (savedVariant && variantImages[savedVariant]) {
+          const imgEl = document.getElementById('trackingProductImg');
+          if (imgEl) {
+            imgEl.src = variantImages[savedVariant];
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  </script>
+
+</body>
+</html>

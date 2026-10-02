@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Payment Received | Takealot</title>
+
+  <style>
+    :root {
+      --primary-blue: #0b6ecb;
+      --primary-blue-hover: #0959a5;
+      --takealot-green: #178a3b;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --border-color: #e5e7eb;
+      --bg-gray: #f4f5f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg-gray);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 540px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #ffffff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* HEADER FIXO / STICKY */
+    .topbar {
+      height: 56px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      letter-spacing: -0.2px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 0 16px;
+    }
+
+    /* CARD / CONTAINER PRINCIPAL */
+    .card {
+      width: 100%;
+      background: #ffffff;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .confirmation {
+      padding: 34px 20px 24px;
+    }
+
+    /* ILUSTRAÇÃO DA CAIXA COM CHECK */
+    .box-container {
+      margin: 0 auto 28px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .box {
+      width: clamp(120px, 34vw, 146px);
+      height: clamp(86px, 24vw, 102px);
+      background: linear-gradient(145deg, #d3a780, #bf936c);
+      margin: 0 auto;
+      position: relative;
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .box:before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: -9px;
+      width: calc(100% + 12px);
+      height: 24px;
+      background: #b58760;
+      border-radius: 3px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .box:after {
+      content: "✓";
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      transform: translateX(-50%);
+      width: clamp(48px, 13vw, 56px);
+      height: clamp(48px, 13vw, 56px);
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--takealot-green);
+      font-size: clamp(32px, 8.5vw, 40px);
+      font-weight: 800;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .shadow {
+      width: clamp(140px, 40vw, 185px);
+      height: 12px;
+      background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+      border-radius: 50%;
+      margin: 4px auto 26px;
+    }
+
+    /* TEXTO PRINCIPAL */
+    h1 {
+      font-size: clamp(20px, 5.8vw, 26px);
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.3;
+      margin: 0 0 14px;
+      letter-spacing: -0.3px;
+      padding: 0 10px;
+    }
+
+    .order {
+      font-size: clamp(15px, 4vw, 17.5px);
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin: 0 0 26px;
+      padding: 0 10px;
+      word-break: break-word;
+    }
+
+    .order strong {
+      color: var(--primary-blue);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* BOTÕES DE AÇÃO */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 440px;
+      height: 50px;
+      margin: 0 auto 16px;
+      padding: 0 20px;
+      border-radius: 9999px;
+      background: var(--primary-blue);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 16.5px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      box-shadow: 0 2px 8px rgba(11, 110, 203, 0.28);
+      transition: background-color 0.15s ease, transform 0.15s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: var(--primary-blue-hover);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .continue {
+      display: inline-block;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary-blue);
+      text-decoration: none;
+      padding: 8px 16px;
+      transition: opacity 0.15s ease;
+    }
+
+    .continue:hover {
+      text-decoration: underline;
+    }
+
+    /* BANNER PROMOCIONAL */
+    .banner-container {
+      padding: 0 16px;
+      margin: 18px auto 22px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .banner {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      aspect-ratio: 320 / 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .banner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* VOUCHER */
+    .voucher {
+      background: #f8fafc;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 28px 20px 26px;
+      text-align: center;
+    }
+
+    .voucher p {
+      margin: 0;
+      color: #374151;
+      font-size: clamp(14px, 3.8vw, 15.5px);
+      line-height: 1.55;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .voucher b {
+      color: #111827;
+      font-weight: 700;
+    }
+
+    .terms {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--primary-blue);
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+
+    .terms:hover {
+      text-decoration: underline;
+    }
+
+    /* ÁREA DO PRODUTO ADQUIRIDO */
+    .product-area {
+      background: #f0f7ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 16px 40px;
+      flex: 1;
+    }
+
+    .product-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--primary-blue);
+      margin-bottom: 14px;
+      background: rgba(11, 110, 203, 0.08);
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .product {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-img {
+      display: block;
+      width: 100%;
+      max-height: 250px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.09));
+    }
+
+    /* ===== RESPONSIVIDADE PARA TELAS DE CELULAR ===== */
+    @media (max-width: 420px) {
+      .confirmation {
+        padding: 26px 16px 20px;
+      }
+
+      .btn {
+        height: 48px;
+        font-size: 16px;
+      }
+
+      .voucher {
+        padding: 22px 16px;
+      }
+
+      .product-area {
+        padding: 24px 14px 32px;
+      }
+
+      .product-img {
+        max-height: 220px;
+      }
+    }
+
+    /* TELAS ULTRA-COMPACTAS (320px - 340px) */
+    @media (max-width: 340px) {
+      .topbar {
+        height: 50px;
+        font-size: 17px;
+      }
+
+      .confirmation {
+        padding: 20px 10px 16px;
+      }
+
+      .box {
+        width: 110px;
+        height: 78px;
+      }
+
+      .box:before {
+        height: 20px;
+        top: -7px;
+      }
+
+      .box:after {
+        width: 44px;
+        height: 44px;
+        font-size: 28px;
+        top: 6px;
+      }
+
+      .shadow {
+        width: 130px;
+        height: 10px;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        font-size: 18.5px;
+        margin-bottom: 10px;
+      }
+
+      .order {
+        font-size: 13.5px;
+        margin-bottom: 20px;
+      }
+
+      .btn {
+        height: 44px;
+        font-size: 14.5px;
+        margin-bottom: 12px;
+      }
+
+      .continue {
+        font-size: 14px;
+        padding: 6px 10px;
+      }
+
+      .banner-container {
+        padding: 0 10px;
+        margin: 14px auto 16px;
+      }
+
+      .voucher {
+        padding: 18px 10px;
+      }
+
+      .voucher p {
+        font-size: 13px;
+      }
+
+      .terms {
+        font-size: 13px;
+      }
+
+      .product-area {
+        padding: 20px 10px 28px;
+      }
+
+      .product-img {
+        max-height: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      Payment
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <section class="card">
+
+      <!-- CONFIRMAÇÃO -->
+      <div class="confirmation">
+
+        <div class="box-container">
+          <div class="box"></div>
+          <div class="shadow"></div>
+        </div>
+
+        <h1>
+          Thanks, we've received your order.
+        </h1>
+
+        <p class="order">
+          We've sent you email confirmation.<br>
+          Your order number is
+          <strong id="successOrderNum">226126728</strong>
+        </p>
+        <p class="order" style="font-size:clamp(13px,3.5vw,15px); margin-top:-10px;">
+          Ordered: <strong id="successOrderDate">–</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Estimated Delivery: <strong id="successDeliveryDate">–</strong>
+        </p>
+
+        <a href="track.html" class="btn">
+          Track Order
+        </a>
+
+        <a href="index.html" class="continue">
+          Continue Shopping
+        </a>
+
+      </div>
+
+      <!-- BANNER PROMOCIONAL -->
+      <div class="banner-container">
+        <div class="banner">
+          <img
+            src="banner.jpg"
+            alt="Delivered in minutes"
+          >
+        </div>
+      </div>
+
+      <!-- VOUCHER -->
+      <div class="voucher">
+        <p>
+          We're giving away a
+          <b>R1000 shopping voucher</b>
+          every month! Simply review one of your purchased
+          products to enter. Each unique review received
+          during the calendar month will automatically be
+          entered into the monthly competition draw.
+        </p>
+
+        <a href="#" class="terms">
+          T&amp;Cs apply.
+        </a>
+      </div>
+
+      <!-- PRODUTO COMPRADO -->
+      <div class="product-area">
+        <span class="product-label">Order Item</span>
+        <div class="product">
+          <img
+            class="product-img"
+            src="produto.png"
+            alt="Conjunto de panelas"
+          >
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    (function initSuccess() {
+      // ---- helpers ----
+      function fmt(d) {
+        var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+      }
+      function fmtShort(d) {
+        var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+      }
+
+      // ---- purchase date: save today if not already saved ----
+      var stored = localStorage.getItem('takealot_purchase_date');
+      var purchaseDate;
+      if (stored) {
+        purchaseDate = new Date(stored);
+        // sanity-check: if stored date is in the future (clock skew etc.) reset
+        if (isNaN(purchaseDate.getTime()) || purchaseDate > new Date()) {
+          purchaseDate = new Date();
+        }
+      } else {
+        purchaseDate = new Date();
+      }
+      // Always persist it so other pages pick it up
+      localStorage.setItem('takealot_purchase_date', purchaseDate.toISOString());
+
+      // ---- delivery date = purchase + 7 days ----
+      var deliveryDate = new Date(purchaseDate);
+      deliveryDate.setDate(deliveryDate.getDate() + 7);
+
+      // ---- render ----
+      var odEl = document.getElementById('successOrderDate');
+      var ddEl = document.getElementById('successDeliveryDate');
+      if (odEl) odEl.textContent = fmt(purchaseDate);
+      if (ddEl) ddEl.textContent = fmt(deliveryDate);
+    })();
+  </script>
+
+</body>
+</html>

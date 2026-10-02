@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Order #226126728 | Takealot.com</title>
+
+  <style>
+    :root {
+      --primary-blue: #0b79bf;
+      --takealot-blue: #0b6ecb;
+      --takealot-green: #1c853f;
+      --text-dark: #111827;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --text-subtle: #4b5563;
+      --border-color: #e5e7eb;
+      --border-dashed: #d5d9df;
+      --bg-gray: #f2f2f4;
+      --divider-bg: #f2f2f4;
+      --badge-gray: #adadad;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: #f2f2f4;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* CONTAINER PRINCIPAL MOBILE-FIRST (100% fiel ao layout Takealot App/Mobile) */
+    .track-wrap {
+      width: 100%;
+      max-width: 500px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+      padding-bottom: max(32px, env(safe-area-inset-bottom, 20px));
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 54px;
+      padding: 0 16px;
+    }
+
+    .header__left {
+      display: flex;
+      align-items: center;
+      width: 36px;
+    }
+
+    .hamburger-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      color: #1f2937;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .header__center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      height: 24px;
+      width: auto;
+      display: block;
+    }
+
+    .header__right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 68px;
+      justify-content: flex-end;
+    }
+
+    .header-icon-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1f2937;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 0;
+    }
+
+
+    /* ===== ORDER TITLE STRIP (Fundo cinza claro exatamente como no print: #f2f2f4) ===== */
+    .order-title-strip {
+      padding: 13px 16px 12px;
+      background: #f2f2f4;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-header-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .order-number {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #111827;
+      letter-spacing: -0.2px;
+    }
+
+    .view-all-link {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--primary-blue);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .view-all-link:hover {
+      text-decoration: underline;
+    }
+
+    .order-dates {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    /* ===== ESTIMATED COLLECTION / STATUS / PRODUTO ===== */
+    .collection-section {
+      padding: 16px 16px 18px;
+      background: #ffffff;
+    }
+
+    .collection-title {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #111827;
+      letter-spacing: -0.2px;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--badge-gray);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    /* NOTE BOX (Caixa com borda pontilhada idêntica ao print) */
+    .note-box {
+      border: 1px dashed var(--border-dashed);
+      border-radius: 3px;
+      background: #ffffff;
+      padding: 11px 13px;
+      font-size: 13.5px;
+      color: #374151;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    /* ITEM DO PRODUTO (100% fiel à imagem) */
+    .product-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .product-thumb-box {
+      width: 74px;
+      height: 74px;
+      flex-shrink: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 3px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .product-thumb {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .product-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+      line-height: 1.35;
+      margin-bottom: 3px;
+    }
+
+    .product-price-line {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 3px;
+    }
+
+    .product-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .product-qty {
+      font-size: 13px;
+      color: #8c96a3;
+      font-weight: 400;
+      margin-left: 6px;
+    }
+
+    .product-seller {
+      font-size: 12.5px;
+      color: #718096;
+    }
+
+    .product-seller strong {
+      color: #2d3748;
+      font-weight: 600;
+    }
+
+    /* BOTÕES DE AÇÃO (Pills idênticas ao print) */
+    .actions-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pill-btn {
+      width: 114px;
+      height: 38px;
+      border-radius: 9999px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #374151;
+      font-size: 13.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .pill-btn:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    .pill-btn:active {
+      transform: scale(0.98);
+      background: #f3f4f6;
+    }
+
+    .pill-btn svg {
+      width: 16px;
+      height: 16px;
+      color: #374151;
+      flex-shrink: 0;
+    }
+
+    /* TIMELINE DE RASTREIO EXPANSÍVEL AO CLICAR EM TRACK */
+    .timeline-drawer {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      background: #f9fafb;
+    }
+
+    .timeline-drawer.is-open {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .timeline-step {
+      display: flex;
+      gap: 10px;
+      position: relative;
+      padding-bottom: 16px;
+    }
+
+    .timeline-step:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-step::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 18px;
+      bottom: 0;
+      width: 2px;
+      background: #e2e8f0;
+    }
+
+    .timeline-step:last-child::before {
+      display: none;
+    }
+
+    .timeline-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #9ca3af;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+
+    .timeline-step.active .timeline-dot {
+      background: var(--takealot-green);
+    }
+
+    .timeline-info {
+      flex: 1;
+    }
+
+    .timeline-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .timeline-date {
+      font-size: 11.5px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    /* ===== FAIXA DIVISÓRIA CINZA (8px exatamente como no print Takealot) ===== */
+    .section-divider {
+      height: 8px;
+      background: var(--divider-bg);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      width: 100%;
+    }
+
+    /* ===== ORDER SUMMARY (100% igual ao print) ===== */
+    .summary-section {
+      padding: 18px 16px 20px;
+      background: #ffffff;
+    }
+
+    .summary-heading {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #9aa3af;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .summary-row.total-row {
+      margin-top: 14px;
+      font-weight: 500;
+      color: #111827;
+      font-size: 14.5px;
+    }
+
+    .summary-row.paid-row {
+      color: #111827;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .summary-row .val {
+      font-weight: 700;
+      color: #000000;
+    }
+
+    .summary-dashed-line {
+      border-top: 1px dashed var(--border-dashed);
+      margin: 18px 0 16px;
+    }
+
+    /* ===== PICKUP POINT ===== */
+    .pickup-section {
+      background: #ffffff;
+    }
+
+    .pickup-heading {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #9aa3af;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .pickup-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 3px;
+    }
+
+    .pickup-address {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .pickup-hours {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    /* RESPONSIVIDADE PARA TELAS MENORES (320px..360px) */
+    @media (max-width: 360px) {
+      .order-title-strip,
+      .collection-section,
+      .summary-section {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .actions-row {
+        gap: 8px;
+      }
+
+      .pill-btn {
+        width: 106px;
+        height: 36px;
+        font-size: 12.5px;
+      }
+
+      .product-thumb-box {
+        width: 66px;
+        height: 66px;
+      }
+
+      .product-title {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="track-wrap">
+
+    <!-- HEADER (100% igual ao Takealot) -->
+    <header class="header" aria-label="Takealot header">
+      <div class="header__left">
+        <a href="index.html" class="hamburger-btn" aria-label="Open menu">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </a>
+      </div>
+
+      <div class="header__center">
+        <a href="index.html" class="logo-link" aria-label="Go to homepage">
+          <img src="logo-takealot.svg" alt="takealot.com" class="logo-img" />
+        </a>
+      </div>
+
+      <div class="header__right">
+        <button class="header-icon-btn" aria-label="Search" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#222222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.2-3.2"></path>
+          </svg>
+        </button>
+
+        <a href="cart.html" class="header-icon-btn" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#222222">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+          </svg>
+        </a>
+      </div>
+    </header>
+
+
+    <!-- ORDER HEADER STRIP (Fundo cinza claro idêntico ao print) -->
+    <div class="order-title-strip">
+      <div class="order-header-row">
+        <h1 class="order-number">Order #226126728</h1>
+        <a href="index.html" class="view-all-link">View All Orders</a>
+      </div>
+      <div class="order-dates">
+        ORDERED: <span id="trackOrderedDate">–</span> &nbsp; PAID: <span id="trackPaidDate">–</span>
+      </div>
+    </div>
+
+    <!-- ESTIMATED DELIVERY & PRODUCT INFO -->
+    <div class="collection-section">
+      <h2 class="collection-title">Estimated Delivery from <span id="trackDeliveryDate">–</span></h2>
+      <div class="status-badge">NOT YET READY</div>
+
+      <!-- NOTA PONTILHADA -->
+      <div class="note-box">
+        Note: We'll send you an SMS or email once your order is ready for delivery
+      </div>
+
+      <!-- PRODUTO (KIT DE PANELAS R 97) -->
+      <div class="product-row">
+        <div class="product-thumb-box">
+          <img id="trackProductImg" class="product-thumb" src="produto.png" alt="Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set" onerror="this.src='https://media.takealot.com/covers_images/f25083c50eee4bf1a854dadfa44c8e7f/s-zoom.file'" />
+        </div>
+
+        <div class="product-info">
+          <div class="product-title" id="trackProductTitle">
+            Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set
+          </div>
+
+          <div class="product-price-line">
+            <span class="product-price" id="trackProductPrice">R 97</span>
+            <span class="product-qty">Qty: 1</span>
+          </div>
+
+          <div class="product-seller">
+            Sold by <strong>Precision Cooking</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÕES DE AÇÃO PILL (TRACK / CANCEL) -->
+      <div class="actions-row">
+        <a href="tracking.html" class="pill-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="7"></circle>
+            <line x1="12" y1="1" x2="12" y2="4"></line>
+            <line x1="12" y1="20" x2="12" y2="23"></line>
+            <line x1="1" y1="12" x2="4" y2="12"></line>
+            <line x1="20" y1="12" x2="23" y2="12"></line>
+          </svg>
+          <span>Track</span>
+        </a>
+
+        <button class="pill-btn" type="button" onclick="alert('Order cancellation request has been submitted.')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          <span>Cancel</span>
+        </button>
+      </div>
+
+      <!-- TIMELINE DE RASTREIO EXPANSÍVEL -->
+      <div class="timeline-drawer" id="timelineDrawer">
+        <div class="timeline-step active">
+          <div class="timeline-dot">✓</div>
+          <div class="timeline-info">
+            <div class="timeline-title">Order Placed &amp; Paid</div>
+            <div class="timeline-date" id="tlOrderPlaced">–</div>
+          </div>
+        </div>
+
+        <div class="timeline-step active">
+          <div class="timeline-dot">✓</div>
+          <div class="timeline-info">
+            <div class="timeline-title">Payment Confirmed</div>
+            <div class="timeline-date">Credit / Debit Card</div>
+          </div>
+        </div>
+
+        <div class="timeline-step" id="tlStepPacking">
+          <div class="timeline-dot">3</div>
+          <div class="timeline-info">
+            <div class="timeline-title">Packing at Warehouse</div>
+            <div class="timeline-date" id="tlPacking">–</div>
+          </div>
+        </div>
+
+        <div class="timeline-step" id="tlStepOutDelivery">
+          <div class="timeline-dot">4</div>
+          <div class="timeline-info">
+            <div class="timeline-title">Out for Delivery</div>
+            <div class="timeline-date" id="tlOutDelivery">–</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAIXA DIVISÓRIA CINZA DE SEÇÃO -->
+    <div class="section-divider"></div>
+
+    <!-- ORDER SUMMARY (100% igual ao print) -->
+    <section class="summary-section" aria-label="Order summary">
+      <div class="summary-heading">ORDER SUMMARY</div>
+
+      <div class="summary-row">
+        <span>1 Item</span>
+        <span class="val" id="summaryItemPrice">R 97</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Delivery</span>
+        <span class="val" id="summaryDeliveryPrice">FREE</span>
+      </div>
+
+      <div class="summary-row total-row">
+        <span>Order Total:</span>
+        <span class="val" id="summaryTotalPrice">R 97</span>
+      </div>
+
+      <div class="summary-row paid-row">
+        <span>Paid (Credit / Debit Card)</span>
+        <span class="val" id="summaryPaidPrice">-R 97</span>
+      </div>
+
+      <div class="summary-dashed-line"></div>
+
+      <!-- TAKEALOT PICKUP POINT -->
+      <div class="pickup-section">
+        <div class="pickup-heading">TAKEALOT PICKUP POINT</div>
+        <div class="pickup-name">Takealot Pickup Point - Richmond Park</div>
+        <div class="pickup-address">Richmond Park, Cape Town, 7441</div>
+        <div class="pickup-hours">Mon - Fri: 08:00 - 18:00 &bull; Sat - Sun: 08:00 - 17:00</div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    function toggleTimeline() {
+      const drawer = document.getElementById('timelineDrawer');
+      drawer.classList.toggle('is-open');
+    }
+
+    // ---- Date helpers ----
+    function fmt(d) {
+      var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    function fmtShort(d) {
+      var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    (function initTrackPage() {
+      try {
+        // ---- Variant image ----
+        const variantImages = {
+          "Antracit": "https://media.takealot.com/covers_images/f25083c50eee4bf1a854dadfa44c8e7f/s-zoom.file",
+          "Black Rose": "https://media.takealot.com/covers_images/5424cf30b14b4334b3f81e3a479ff705/s-zoom.file",
+          "Deep Sea": "https://media.takealot.com/covers_images/e8ef492d27c64606bf63eb4c7dcde092/s-zoom.file",
+          "Green": "https://media.takealot.com/covers_images/343c1ee1aa364cb0adba86dff77636e0/s-zoom.file",
+          "Leonardo": "https://media.takealot.com/covers_images/2e0eaeb2f9fb462fa1128ee55160ba7c/s-zoom.file",
+          "Matt Black": "https://media.takealot.com/covers_images/85c88b010f3c4c9fa3080e72bf80b8e6/s-zoom.file",
+          "Sahara": "https://media.takealot.com/covers_images/570195c866ba4737aa71c6ca495111b1/s-zoom.file",
+          "Taupe": "https://media.takealot.com/covers_images/5be4f6df851346168d4e050d860e073a/s-zoom.file"
+        };
+        const savedVariant = localStorage.getItem("takealot_cart_variant");
+        if (savedVariant && variantImages[savedVariant]) {
+          const imgEl = document.getElementById('trackProductImg');
+          if (imgEl) imgEl.src = variantImages[savedVariant];
+        }
+
+        // ---- Purchase & delivery dates ----
+        var stored = localStorage.getItem('takealot_purchase_date');
+        var purchaseDate = stored ? new Date(stored) : new Date();
+        if (isNaN(purchaseDate.getTime())) purchaseDate = new Date();
+
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Intermediate dates
+        var packDate = new Date(purchaseDate); packDate.setDate(packDate.getDate() + 4);
+        var deliveryDate = new Date(purchaseDate); deliveryDate.setDate(deliveryDate.getDate() + 7);
+
+        // Days elapsed since purchase
+        var purchaseMidnight = new Date(purchaseDate); purchaseMidnight.setHours(0,0,0,0);
+        var daysElapsed = Math.floor((today - purchaseMidnight) / 86400000);
+
+        // ---- Fill header dates ----
+        var el;
+        el = document.getElementById('trackOrderedDate'); if(el) el.textContent = fmtShort(purchaseDate);
+        el = document.getElementById('trackPaidDate');    if(el) el.textContent = fmtShort(purchaseDate);
+        el = document.getElementById('trackDeliveryDate'); if(el) el.textContent = fmt(deliveryDate);
+
+        // ---- Fill timeline dates ----
+        el = document.getElementById('tlOrderPlaced');
+        if(el) el.textContent = fmt(purchaseDate);
+        el = document.getElementById('tlPacking');
+        if(el) el.textContent = 'Expected ' + fmt(packDate);
+        el = document.getElementById('tlOutDelivery');
+        if(el) el.textContent = 'Expected ' + fmt(deliveryDate);
+
+        // ---- Progress timeline based on days elapsed ----
+        // Day 0-3: steps 1+2 active
+        // Day 4-6: steps 1+2+3 active
+        // Day 7+:  all 4 steps active (delivered)
+        var packStep = document.getElementById('tlStepPacking');
+        var delivStep = document.getElementById('tlStepOutDelivery');
+
+        if (daysElapsed >= 4 && packStep) {
+          packStep.classList.add('active');
+          var dot = packStep.querySelector('.timeline-dot');
+          if(dot) dot.textContent = '✓';
+        }
+        if (daysElapsed >= 7 && delivStep) {
+          delivStep.classList.add('active');
+          var dot2 = delivStep.querySelector('.timeline-dot');
+          if(dot2) dot2.textContent = '✓';
+          // Update the status badge
+          var badge = document.querySelector('.status-badge');
+          if(badge) { badge.textContent = 'DELIVERED'; badge.style.background='#16a34a'; badge.style.color='#fff'; }
+          // Update title
+          var h2 = document.querySelector('.collection-title');
+          if(h2) h2.textContent = 'Delivered on ' + fmt(deliveryDate);
+        }
+      } catch(e) { console.error(e); }
+    })();
+  </script>
+
+</body>
+</html>
