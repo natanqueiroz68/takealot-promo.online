@@ -24,7 +24,7 @@ const SECRET      = process.env.WEBHOOK_SECRET;
 // ── Vercel config: MUST disable body parser to access raw bytes for HMAC ──────
 // If bodyParser is enabled (default), req loses the original byte stream and
 // HMAC verification becomes impossible.
-module.exports.config = {
+const config = {
   api: {
     bodyParser: false,
   },
@@ -33,6 +33,18 @@ module.exports.config = {
 // ── Raw body reader ────────────────────────────────────────────────────────────
 // Reads the request stream into a Buffer, respecting a 1 MB size limit.
 function readRawBody(req) {
+  // If raw body is already provided on req (e.g. by runtime or middleware)
+  if (Buffer.isBuffer(req.rawBody)) return Promise.resolve(req.rawBody);
+  if (typeof req.rawBody === 'string') return Promise.resolve(Buffer.from(req.rawBody, 'utf8'));
+  if (Buffer.isBuffer(req.body)) return Promise.resolve(req.body);
+
+  // If stream has already finished or ended
+  if (req.readableEnded || req.complete) {
+    if (typeof req.body === 'string') return Promise.resolve(Buffer.from(req.body, 'utf8'));
+    if (req.body && typeof req.body === 'object') return Promise.resolve(Buffer.from(JSON.stringify(req.body), 'utf8'));
+    return Promise.resolve(Buffer.alloc(0));
+  }
+
   return new Promise((resolve, reject) => {
     const MAX_BYTES = 1_048_576; // 1 MB
     const chunks = [];
@@ -92,7 +104,7 @@ function isPaymentConfirmed(payload) {
 }
 
 // ── Main handler ───────────────────────────────────────────────────────────────
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer');
 
@@ -236,4 +248,9 @@ module.exports = async function handler(req, res) {
 
   console.log('[webhook] saved order:', orderId);
   return res.status(200).json({ received: true, processed: true, order_id: orderId });
-};
+}
+
+handler.config = config;
+module.exports = handler;
+module.exports.config = config;
+
