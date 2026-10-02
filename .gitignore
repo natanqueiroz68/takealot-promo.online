@@ -1,0 +1,11 @@
+# Environment secrets — NEVER commit real values
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Vercel local dev
+.vercel/
+
+# macOS
+.DS_Store

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Confirmation | Takealot</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    /* ── LIGHT MODE (default) ── */
+    :root {
+      --bg-outer:    #f4f4f4;
+      --bg-main:     #ffffff;
+      --bg-header:   #f0f0f0;
+      --bg-bar:      #e8e8e8;
+      --bg-section:  #f5f5f5;
+      --bg-track:    #dbeeff;
+      --text-main:   #222222;
+      --text-muted:  #555555;
+      --text-label:  #444444;
+      --text-header: #333333;
+      --text-bar:    #333333;
+      --link-color:  #1570b8;
+      --border:      #dddddd;
+      --btn-bg:      #168bd0;
+      --btn-text:    #ffffff;
+    }
+
+    /* ── DARK MODE ── */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-outer:    #f4f4f4;
+        --bg-main:     #202224;
+        --bg-header:   #303335;
+        --bg-bar:      #292b2d;
+        --bg-section:  #292b2d;
+        --bg-track:    #1a3a52;
+        --text-main:   #eeeeee;
+        --text-muted:  #aaaaaa;
+        --text-label:  #999999;
+        --text-header: #eeeeee;
+        --text-bar:    #eeeeee;
+        --link-color:  #5ca9ed;
+        --border:      #36383a;
+        --btn-bg:      #168bd0;
+        --btn-text:    #ffffff;
+      }
+    }
+
+    body {
+      margin: 0; padding: 0;
+      background: var(--bg-outer);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text-main);
+    }
+
+    .email-container {
+      width: 100%;
+      max-width: 780px;
+      margin: 30px auto;
+      background: var(--bg-main);
+      box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--bg-header);
+      min-height: 106px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 40px;
+      font-weight: bold;
+      letter-spacing: -2px;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .logo span {
+      display: inline-flex;
+      width: 55px; height: 55px;
+      border-radius: 50%;
+      background: #168bd0;
+      color: white;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+    .header-title {
+      color: var(--text-header);
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* ORDER BAR */
+    .order-bar {
+      background: var(--bg-bar);
+      padding: 27px 30px;
+      color: var(--text-bar);
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 15px;
+      font-weight: bold;
+      flex-wrap: wrap;
+    }
+    a { color: var(--link-color); text-decoration: underline; }
+
+    /* CONTENT */
+    .content {
+      padding: 28px 30px;
+      color: var(--text-main);
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    .content p { margin: 0 0 24px; }
+
+    .button {
+      display: inline-block;
+      background: var(--btn-bg);
+      color: var(--btn-text) !important;
+      text-decoration: none !important;
+      font-weight: bold;
+      padding: 12px 20px;
+      border-radius: 4px;
+      margin: 2px 0 27px;
+      font-size: 15px;
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+      background: var(--bg-section);
+      color: var(--text-muted);
+      padding: 13px 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border-top: 1px solid var(--border);
+    }
+
+    /* DETAILS */
+    .details {
+      padding: 18px 30px;
+      color: var(--text-main);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      margin-bottom: 13px;
+    }
+    .label { font-weight: bold; color: var(--text-label); }
+
+    /* ITEMS */
+    .items-header {
+      background: var(--bg-section);
+      padding: 13px 14px;
+      color: var(--text-muted);
+      font-weight: bold;
+      font-size: 15px;
+      border-top: 1px solid var(--border);
+    }
+    .product {
+      display: grid;
+      grid-template-columns: 75px 1fr 90px;
+      gap: 15px;
+      align-items: center;
+      padding: 25px 30px;
+      color: var(--text-main);
+    }
+    .product-image {
+      width: 65px; height: 65px;
+      background: white;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ddd;
+    }
+    .product-image img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .product-name {
+      color: var(--link-color);
+      text-decoration: underline;
+      font-weight: bold;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+    .product-sub {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .price { text-align: right; font-weight: bold; }
+
+    /* TOTALS */
+    .totals {
+      width: 300px;
+      margin-left: auto;
+      padding: 0 30px 28px;
+      color: var(--text-main);
+      font-size: 15px;
+      line-height: 1.9;
+      border-top: 1px solid var(--border);
+    }
+    .total-row { display: flex; justify-content: space-between; }
+    .total-row.grand {
+      font-weight: bold;
+      font-size: 16px;
+      border-top: 1px solid var(--border);
+      padding-top: 6px;
+      margin-top: 4px;
+    }
+
+    /* TRACK BANNER */
+    .track-banner {
+      background: var(--bg-track);
+      margin: 0 28px 24px;
+      border-radius: 6px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      border: 1px solid rgba(22,139,208,.25);
+    }
+    .track-text { font-size: 14px; color: var(--text-main); }
+    .track-text strong { display: block; font-size: 15px; margin-bottom: 3px; }
+
+    /* FOOTER */
+    .footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg-header);
+      padding: 18px 30px;
+      color: var(--text-muted);
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* MOBILE */
+    @media (max-width: 600px) {
+      .email-container { margin: 0; }
+      .header { padding: 22px 18px; gap: 15px; }
+      .logo { font-size: 30px; }
+      .logo span { width: 43px; height: 43px; font-size: 15px; }
+      .header-title { font-size: 15px; }
+      .order-bar { padding: 20px 18px; font-size: 13px; flex-direction: column; gap: 6px; }
+      .content, .details { padding-left: 18px; padding-right: 18px; }
+      .section-title, .items-header { padding-left: 18px; }
+      .detail-row { grid-template-columns: 1fr; gap: 2px; margin-bottom: 16px; }
+      .product { grid-template-columns: 65px 1fr; padding: 20px 18px; }
+      .price { grid-column: 2; text-align: left; }
+      .totals { width: 100%; padding: 0 18px 24px; }
+      .track-banner { margin: 0 18px 20px; padding: 16px; }
+      .footer { padding: 16px 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="email-container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">
+      takealot<span>.com</span>
+    </div>
+    <div class="header-title">Payment Confirmation</div>
+  </div>
+
+  <!-- ORDER BAR -->
+  <div class="order-bar">
+    <div>
+      Order Number:
+      <a href="https://www.takealot-promo.online/track.html">{{order_number}}</a>
+    </div>
+    <div>Estimated Delivery Date: {{delivery_date}}</div>
+  </div>
+
+  <!-- MAIN MESSAGE -->
+  <div class="content">
+    <p>Hi <strong>{{customer_name}}</strong>,</p>
+    <p>
+      Thank you, we've received your payment for order
+      <strong>{{order_number}}</strong>.
+    </p>
+    <p>
+      Your order is being processed and your estimated delivery date is
+      <strong>{{delivery_date_long}}</strong>.
+    </p>
+    <p>
+      Once your order is ready to be delivered, you will receive an SMS
+      notification confirming your scheduled delivery date.
+    </p>
+    <a href="https://www.takealot-promo.online/track.html" class="button">
+      Manage Order
+    </a>
+    <p style="margin-bottom:0;">
+      Regards,<br>
+      The
+      <span style="background:#f1d36a;color:#222;padding:1px 3px;font-weight:bold;">Takealot</span>
+      Team
+    </p>
+  </div>
+
+  <!-- ORDER DETAILS -->
+  <div class="section-title">Order Details</div>
+  <div class="details">
+    <div class="detail-row">
+      <div class="label">Order Date:</div>
+      <div>{{order_date}}</div>
+    </div>
+    <div class="detail-row">
+      <div class="label">Estimated Delivery Date:</div>
+      <div>{{delivery_date_long}}</div>
+    </div>
+    <div class="detail-row">
+      <div class="label">Delivery Method:</div>
+      <div>Courier</div>
+    </div>
+  </div>
+
+  <!-- TRACK BANNER -->
+  <div class="track-banner">
+    <div class="track-text">
+      <strong>🚚 Track your order</strong>
+      Get real-time updates on your delivery status.
+    </div>
+    <a href="https://www.takealot-promo.online/track.html" class="button" style="margin:0;">
+      Track Order
+    </a>
+  </div>
+
+  <!-- ITEMS -->
+  <div class="items-header">Items in this order</div>
+  <div class="product">
+    <div class="product-image">
+      <img
+        src="https://media.takealot.com/covers_images/f25083c50eee4bf1a854dadfa44c8e7f/s-zoom.file"
+        alt="Berlinger Haus Cookware Set"
+        onerror="this.onerror=null;this.src='https://www.takealot-promo.online/produto.png';"
+      />
+    </div>
+    <div>
+      <div class="product-name">
+        Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set
+      </div>
+      <div class="product-sub">Colour: {{variant}} &nbsp;|&nbsp; Qty: 1</div>
+    </div>
+    <div class="price">R 97.00</div>
+  </div>
+
+  <!-- TOTALS -->
+  <div class="totals">
+    <div class="total-row">
+      <strong>Subtotal:</strong><span>R 97.00</span>
+    </div>
+    <div class="total-row">
+      <strong>Shipping:</strong><span style="color:#2e9e4f;">Free</span>
+    </div>
+    <div class="total-row grand">
+      <strong>Total:</strong><span>R 97.00</span>
+    </div>
+  </div>
+
+  <!-- BOTTOM CTA -->
+  <div class="content" style="padding-top:0;">
+    <p>
+      For the most up-to-date order information, please check your
+      <a href="https://www.takealot-promo.online/track.html">Orders</a> page.
+    </p>
+    <a href="https://www.takealot-promo.online/track.html" class="button">
+      View Order
+    </a>
+    <p style="margin:0;">
+      Need help?
+      Find the answer <a href="https://www.takealot-promo.online">here</a>.
+    </p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <a href="https://www.takealot-promo.online">My Account</a>
+      &nbsp;&nbsp;
+      <a href="https://www.takealot-promo.online/track.html">Order History</a>
+      &nbsp;&nbsp;
+      <a href="https://www.takealot-promo.online">Help</a>
+      &nbsp;&nbsp;
+      <a href="https://www.takealot-promo.online">Download Mobile App</a>
+    </div>
+    <div>Connect with us &nbsp;●&nbsp;●</div>
+  </div>
+
+</div>
+<!--
+  ==========================================================
+  WEBHOOK VARIABLES — endpoint:
+  POST https://zenofyetsembasms.online/api/public/tsemba/webhook
+
+  {{customer_name}}      → Full name from payment platform
+  {{order_number}}       → Order / payment ID
+  {{order_date}}         → Purchase date short  e.g. "Thu, 2 Oct 2026"
+  {{delivery_date}}      → order_date + 7 days  e.g. "2026-10-09"
+  {{delivery_date_long}} → e.g. "Thursday, 9 October 2026"
+  {{variant}}            → Colour variant  e.g. "Antracit"
+  ==========================================================
+-->
+</body>
+</html>

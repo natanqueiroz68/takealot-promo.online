@@ -441,7 +441,7 @@
         <p class="order">
           We've sent you email confirmation.<br>
           Your order number is
-          <strong id="successOrderNum">226126728</strong>
+          <strong id="successOrderNum">—</strong>
         </p>
         <p class="order" style="font-size:clamp(13px,3.5vw,15px); margin-top:-10px;">
           Ordered: <strong id="successOrderDate">–</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Estimated Delivery: <strong id="successDeliveryDate">–</strong>
@@ -501,41 +501,69 @@
 
   <script>
     (function initSuccess() {
-      // ---- helpers ----
+      // ---- Date helpers ----
       function fmt(d) {
         var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         return days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
       }
-      function fmtShort(d) {
-        var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-      }
 
-      // ---- purchase date: save today if not already saved ----
-      var stored = localStorage.getItem('takealot_purchase_date');
-      var purchaseDate;
-      if (stored) {
-        purchaseDate = new Date(stored);
-        // sanity-check: if stored date is in the future (clock skew etc.) reset
-        if (isNaN(purchaseDate.getTime()) || purchaseDate > new Date()) {
-          purchaseDate = new Date();
-        }
-      } else {
-        purchaseDate = new Date();
-      }
-      // Always persist it so other pages pick it up
-      localStorage.setItem('takealot_purchase_date', purchaseDate.toISOString());
-
-      // ---- delivery date = purchase + 7 days ----
-      var deliveryDate = new Date(purchaseDate);
-      deliveryDate.setDate(deliveryDate.getDate() + 7);
-
-      // ---- render ----
       var odEl = document.getElementById('successOrderDate');
       var ddEl = document.getElementById('successDeliveryDate');
-      if (odEl) odEl.textContent = fmt(purchaseDate);
-      if (ddEl) ddEl.textContent = fmt(deliveryDate);
+      var onEl = document.getElementById('successOrderNum');
+
+      // ---- Try to get real order ID from URL (?order=T273...) ----
+      var urlOrderId = (new URLSearchParams(window.location.search)).get('order')
+                    || (new URLSearchParams(window.location.search)).get('orderId')
+                    || (new URLSearchParams(window.location.search)).get('id')
+                    || null;
+
+      if (urlOrderId) {
+        // Show order ID immediately (real one from URL)
+        if (onEl) onEl.textContent = urlOrderId;
+
+        // Fetch full order from API
+        fetch('/api/order?id=' + encodeURIComponent(urlOrderId))
+          .then(function(r) { return r.json(); })
+          .then(function(order) {
+            if (order.error) {
+              // Order not yet in DB (webhook may not have fired yet) — show generic
+              if (onEl) onEl.textContent = urlOrderId;
+              _setLegacyDates(fmt, odEl, ddEl);
+              return;
+            }
+            if (onEl) onEl.textContent = order.order_id;
+            if (odEl) odEl.textContent = fmt(new Date(order.received_date));
+            if (ddEl) ddEl.textContent = fmt(new Date(order.delivery_date));
+          })
+          .catch(function() {
+            // API unavailable — show dates from localStorage fallback
+            _setLegacyDates(fmt, odEl, ddEl);
+          });
+        return;
+      }
+
+      // ---- No URL param: use localStorage (legacy path) ----
+      if (onEl) onEl.textContent = '—';
+      _setLegacyDates(fmt, odEl, ddEl);
+
+      function _setLegacyDates(fmt, odEl, ddEl) {
+        var stored = localStorage.getItem('takealot_purchase_date');
+        var purchaseDate;
+        if (stored) {
+          purchaseDate = new Date(stored);
+          if (isNaN(purchaseDate.getTime()) || purchaseDate > new Date()) {
+            purchaseDate = new Date();
+          }
+        } else {
+          purchaseDate = new Date();
+        }
+        localStorage.setItem('takealot_purchase_date', purchaseDate.toISOString());
+        var deliveryDate = new Date(purchaseDate);
+        deliveryDate.setDate(deliveryDate.getDate() + 7);
+        if (odEl) odEl.textContent = fmt(purchaseDate);
+        if (ddEl) ddEl.textContent = fmt(deliveryDate);
+      }
     })();
   </script>
 
