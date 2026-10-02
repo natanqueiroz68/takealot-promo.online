@@ -447,7 +447,7 @@
           Ordered: <strong id="successOrderDate">–</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Estimated Delivery: <strong id="successDeliveryDate">–</strong>
         </p>
 
-        <a href="tracking.html" class="btn" id="trackOrderBtn">
+        <a href="track.html" class="btn" id="trackOrderBtn">
           Track Order
         </a>
 
@@ -520,11 +520,11 @@
       function preserveOrderInLinks(oid) {
         if (!oid) return;
         if (trackBtn) {
-          trackBtn.href = 'tracking.html?order=' + encodeURIComponent(oid);
+          trackBtn.href = 'track.html?order=' + encodeURIComponent(oid);
         }
         var otherLinks = document.querySelectorAll('a[data-order-link], a.track-link');
         for (var i = 0; i < otherLinks.length; i++) {
-          otherLinks[i].href = 'tracking.html?order=' + encodeURIComponent(oid);
+          otherLinks[i].href = 'track.html?order=' + encodeURIComponent(oid);
         }
       }
 
@@ -560,7 +560,7 @@
 
       // No order in URL: show placeholder instead of inventing order number
       if (onEl) onEl.textContent = '—';
-      if (trackBtn) trackBtn.href = 'tracking.html';
+      if (trackBtn) trackBtn.href = 'track.html';
       _setFallbackDates(fmt, odEl, ddEl);
 
       function _setFallbackDates(fmt, odEl, ddEl) {

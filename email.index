@@ -301,7 +301,7 @@
       Once your order is ready to be delivered, you will receive an SMS
       notification confirming your scheduled delivery date.
     </p>
-    <a href="https://www.takealot-promo.online/tracking.html?order={{order_number}}" class="button">
+    <a href="https://www.takealot-promo.online/track.html?order={{order_number}}" class="button">
       Manage Order
     </a>
     <p style="margin-bottom:0;">
@@ -335,7 +335,7 @@
       <strong>🚚 Track your order</strong>
       Get real-time updates on your delivery status.
     </div>
-    <a href="https://www.takealot-promo.online/tracking.html?order={{order_number}}" class="button" style="margin:0;">
+    <a href="https://www.takealot-promo.online/track.html?order={{order_number}}" class="button" style="margin:0;">
       Track Order
     </a>
   </div>
@@ -376,7 +376,7 @@
   <div class="content" style="padding-top:0;">
     <p>
       For the most up-to-date order information, please check your
-      <a href="https://www.takealot-promo.online/tracking.html?order={{order_number}}">Orders</a> page.
+      <a href="https://www.takealot-promo.online/track.html?order={{order_number}}">Orders</a> page.
     </p>
     <a href="https://www.takealot-promo.online/sucess.html?order={{order_number}}" class="button">
       View Order
@@ -392,7 +392,7 @@
     <div>
       <a href="https://www.takealot-promo.online">My Account</a>
       &nbsp;&nbsp;
-      <a href="https://www.takealot-promo.online/tracking.html?order={{order_number}}">Order History</a>
+      <a href="https://www.takealot-promo.online/track.html?order={{order_number}}">Order History</a>
       &nbsp;&nbsp;
       <a href="https://www.takealot-promo.online">Help</a>
       &nbsp;&nbsp;

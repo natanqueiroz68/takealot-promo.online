@@ -444,7 +444,7 @@
           <strong id="successOrderNum">—</strong>
         </p>
 
-        <a href="tracking.html" class="btn" id="trackOrderBtn">
+        <a href="track.html" class="btn" id="trackOrderBtn">
           Track Order
         </a>
 
@@ -509,7 +509,7 @@
       function preserveOrderInLinks(oid) {
         if (!oid) return;
         if (trackBtn) {
-          trackBtn.href = 'tracking.html?order=' + encodeURIComponent(oid);
+          trackBtn.href = 'track.html?order=' + encodeURIComponent(oid);
         }
       }
 
@@ -531,7 +531,7 @@
       }
 
       if (onEl) onEl.textContent = '—';
-      if (trackBtn) trackBtn.href = 'tracking.html';
+      if (trackBtn) trackBtn.href = 'track.html';
     })();
   </script>
 

@@ -603,7 +603,7 @@
 
       <!-- BOTÕES DE AÇÃO PILL (TRACK / CANCEL) -->
       <div class="actions-row">
-        <a href="tracking.html" class="pill-btn">
+        <a href="tracking.html" class="pill-btn" id="trackDetailsBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="7"></circle>
             <line x1="12" y1="1" x2="12" y2="4"></line>
@@ -726,6 +726,10 @@
 
     function preserveOrderInLinks(oid) {
       if (!oid) return;
+      var trackDetailsBtn = document.getElementById('trackDetailsBtn');
+      if (trackDetailsBtn) {
+        trackDetailsBtn.href = 'tracking.html?order=' + encodeURIComponent(oid);
+      }
       var links = document.querySelectorAll('a[href*="sucess.html"], a[href*="tracking.html"], a[href*="track.html"]');
       for (var i = 0; i < links.length; i++) {
         try {
