@@ -44,6 +44,7 @@ function publicView(order) {
     delivery_date:  order.delivery_date,
     tracking_url:   order.tracking_url,
     status:         order.status,
+    email_status:   order.email_status || null,
     status_history: (order.status_history || []).map(function(e) {
       return { status: e.status, timestamp: e.timestamp };
     }),

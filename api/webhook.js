@@ -157,6 +157,7 @@ async function sendOrderConfirmationEmail(order) {
   if (visionSpyKey) {
     const senderId = process.env.VISIONSPY_SENDER_ID || '8ce5156d-4eb9-49c6-af46-fea894020b74';
     try {
+      console.log('[email] Attempting VisionSpy send, senderId:', senderId);
       const res = await fetch('https://visionspyads.com/api/public/v1/email/send', {
         method: 'POST',
         headers: {
@@ -176,6 +177,7 @@ async function sendOrderConfirmationEmail(order) {
         console.error('[email] VisionSpy error:', res.status, data ? (data.error || data.message || data) : 'empty response');
         return { failed: true };
       }
+      console.log('[email] VisionSpy send success:', data && (data.id || data.message));
       return { sent: true, messageId: (data && data.id) || null };
     } catch (err) {
       console.error('[email] VisionSpy network error:', err.message);
@@ -377,10 +379,10 @@ async function handler(req, res) {
   const orderId = payload.orderId || payload.order_id || payload.reference || null;
   if (!orderId) return res.status(400).json({ error: 'Missing orderId' });
 
-  const cust          = payload.customer || {};
-  const customerName  = cust.name || cust.fullName || payload.name || payload.full_name || '';
-  const customerEmail = cust.email || payload.email || '';
-  const customerPhone = cust.phone || payload.phone || '';
+  const cust          = payload.customer || payload.client || payload.buyer || (payload.data && payload.data.customer) || {};
+  const customerName  = cust.name || cust.fullName || cust.full_name || payload.name || payload.full_name || (cust.first_name ? `${cust.first_name} ${cust.last_name || ''}`.trim() : '') || '';
+  const customerEmail = cust.email || cust.customerEmail || cust.customer_email || payload.email || payload.customerEmail || payload.customer_email || (payload.data && payload.data.customer && payload.data.customer.email) || '';
+  const customerPhone = cust.phone || cust.phoneNumber || cust.phone_number || payload.phone || payload.phone_number || '';
 
   const item         = Array.isArray(payload.items) ? payload.items[0] : {};
   const productId    = item.productId  || item.product_id
