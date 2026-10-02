@@ -59,8 +59,8 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const orderId = (req.query.id || '').trim();
-  if (!orderId) return res.status(400).json({ error: 'Missing ?id= parameter' });
+  const orderId = (req.query.order || req.query.id || req.query.orderId || '').trim();
+  if (!orderId) return res.status(400).json({ error: 'Missing ?order= parameter' });
   if (!ORDER_ID_RE.test(orderId)) return res.status(400).json({ error: 'Invalid order id format' });
 
   let order;

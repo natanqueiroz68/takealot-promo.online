@@ -447,7 +447,7 @@
           Ordered: <strong id="successOrderDate">–</strong>&nbsp;&nbsp;|&nbsp;&nbsp;Estimated Delivery: <strong id="successDeliveryDate">–</strong>
         </p>
 
-        <a href="track.html" class="btn">
+        <a href="tracking.html" class="btn" id="trackOrderBtn">
           Track Order
         </a>
 
@@ -500,8 +500,12 @@
   </main>
 
   <script>
+    function getOrderId() {
+      const params = new URLSearchParams(window.location.search);
+      return (params.get('order') || params.get('orderId') || params.get('id') || '').trim();
+    }
+
     (function initSuccess() {
-      // ---- Date helpers ----
       function fmt(d) {
         var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -511,43 +515,55 @@
       var odEl = document.getElementById('successOrderDate');
       var ddEl = document.getElementById('successDeliveryDate');
       var onEl = document.getElementById('successOrderNum');
+      var trackBtn = document.getElementById('trackOrderBtn');
 
-      // ---- Try to get real order ID from URL (?order=T273...) ----
-      var urlOrderId = (new URLSearchParams(window.location.search)).get('order')
-                    || (new URLSearchParams(window.location.search)).get('orderId')
-                    || (new URLSearchParams(window.location.search)).get('id')
-                    || null;
+      function preserveOrderInLinks(oid) {
+        if (!oid) return;
+        if (trackBtn) {
+          trackBtn.href = 'tracking.html?order=' + encodeURIComponent(oid);
+        }
+        var otherLinks = document.querySelectorAll('a[data-order-link], a.track-link');
+        for (var i = 0; i < otherLinks.length; i++) {
+          otherLinks[i].href = 'tracking.html?order=' + encodeURIComponent(oid);
+        }
+      }
+
+      var urlOrderId = getOrderId();
 
       if (urlOrderId) {
-        // Show order ID immediately (real one from URL)
         if (onEl) onEl.textContent = urlOrderId;
+        preserveOrderInLinks(urlOrderId);
 
-        // Fetch full order from API
-        fetch('/api/order?id=' + encodeURIComponent(urlOrderId))
+        // Fetch full order from API (source of truth)
+        fetch('/api/order?order=' + encodeURIComponent(urlOrderId))
           .then(function(r) { return r.json(); })
           .then(function(order) {
             if (order.error) {
-              // Order not yet in DB (webhook may not have fired yet) — show generic
               if (onEl) onEl.textContent = urlOrderId;
-              _setLegacyDates(fmt, odEl, ddEl);
+              _setFallbackDates(fmt, odEl, ddEl);
               return;
             }
             if (onEl) onEl.textContent = order.order_id;
             if (odEl) odEl.textContent = fmt(new Date(order.received_date));
             if (ddEl) ddEl.textContent = fmt(new Date(order.delivery_date));
+            if (order.product_image) {
+              var img = document.querySelector('.product-img');
+              if (img) img.src = order.product_image;
+            }
+            preserveOrderInLinks(order.order_id);
           })
           .catch(function() {
-            // API unavailable — show dates from localStorage fallback
-            _setLegacyDates(fmt, odEl, ddEl);
+            _setFallbackDates(fmt, odEl, ddEl);
           });
         return;
       }
 
-      // ---- No URL param: use localStorage (legacy path) ----
+      // No order in URL: show placeholder instead of inventing order number
       if (onEl) onEl.textContent = '—';
-      _setLegacyDates(fmt, odEl, ddEl);
+      if (trackBtn) trackBtn.href = 'tracking.html';
+      _setFallbackDates(fmt, odEl, ddEl);
 
-      function _setLegacyDates(fmt, odEl, ddEl) {
+      function _setFallbackDates(fmt, odEl, ddEl) {
         var stored = localStorage.getItem('takealot_purchase_date');
         var purchaseDate;
         if (stored) {
@@ -558,7 +574,6 @@
         } else {
           purchaseDate = new Date();
         }
-        localStorage.setItem('takealot_purchase_date', purchaseDate.toISOString());
         var deliveryDate = new Date(purchaseDate);
         deliveryDate.setDate(deliveryDate.getDate() + 7);
         if (odEl) odEl.textContent = fmt(purchaseDate);

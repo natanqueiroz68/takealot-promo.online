@@ -858,11 +858,24 @@
       return months[d.getMonth()] + '<br>' + d.getFullYear();
     }
 
-    // ---- Order ID from URL param (?order=T273...) ----
-    var _urlOrderId = (new URLSearchParams(window.location.search)).get('order')
-                   || (new URLSearchParams(window.location.search)).get('orderId')
-                   || (new URLSearchParams(window.location.search)).get('id')
-                   || null;
+    function getOrderId() {
+      const params = new URLSearchParams(window.location.search);
+      return (params.get('order') || params.get('orderId') || params.get('id') || '').trim();
+    }
+
+    var _urlOrderId = getOrderId();
+
+    function preserveOrderInLinks(oid) {
+      if (!oid) return;
+      var links = document.querySelectorAll('a[href*="sucess.html"], a[href*="tracking.html"], a[href*="track.html"]');
+      for (var i = 0; i < links.length; i++) {
+        try {
+          var u = new URL(links[i].href, window.location.origin);
+          u.searchParams.set('order', oid);
+          links[i].href = u.pathname + u.search + u.hash;
+        } catch(e) {}
+      }
+    }
 
     function _renderTracking(purchaseDate, deliveryDate, status) {
       var shipDate = new Date(purchaseDate); shipDate.setDate(shipDate.getDate() + 1);
@@ -913,7 +926,8 @@
       try {
         // ---- If URL has order ID: fetch from API (source of truth) ----
         if (_urlOrderId) {
-          fetch('/api/order?id=' + encodeURIComponent(_urlOrderId))
+          preserveOrderInLinks(_urlOrderId);
+          fetch('/api/order?order=' + encodeURIComponent(_urlOrderId))
             .then(function(r) { return r.json(); })
             .then(function(order) {
               if (order.error) {
@@ -932,6 +946,7 @@
               if (document.title) document.title = 'Tracking #' + order.order_id + ' | Takealot.com';
               var orderIdSpan = document.getElementById('trackingOrderId');
               if (orderIdSpan) orderIdSpan.textContent = '#' + order.order_id;
+              preserveOrderInLinks(order.order_id);
 
               // ---- Render dates and status ----
               _renderTracking(

@@ -16,6 +16,8 @@
 'use strict';
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -65,7 +67,22 @@ function readRawBody(req) {
   });
 }
 
-// ── Upstash Redis REST helper ──────────────────────────────────────────────────
+// ── Upstash Redis REST helpers ─────────────────────────────────────────────────
+async function kv_get(key) {
+  const res = await fetch(REDIS_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${REDIS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(['GET', key]),
+  });
+  if (!res.ok) throw new Error('Redis GET failed: ' + res.status);
+  const data = await res.json();
+  if (!data.result) return null;
+  try { return JSON.parse(data.result); } catch { return null; }
+}
+
 async function kv_set(key, value) {
   const res = await fetch(REDIS_URL, {
     method: 'POST',
@@ -84,6 +101,148 @@ function addDays(isoDate, days) {
   const d = new Date(isoDate);
   d.setDate(d.getDate() + days);
   return d.toISOString();
+}
+
+// ── Email template renderer & sender ───────────────────────────────────────────
+function renderOrderEmail(order) {
+  let template = '';
+  try {
+    template = fs.readFileSync(path.join(process.cwd(), 'email.index'), 'utf8');
+  } catch (err) {
+    console.error('[email] Error loading email.index template:', err.message);
+    return null;
+  }
+
+  const d = new Date(order.received_date || Date.now());
+  const del = new Date(order.delivery_date || (Date.now() + 7 * 86400000));
+
+  const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const daysLong = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const monthsLong = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const orderDateShort = `${daysShort[d.getDay()]}, ${d.getDate()} ${monthsShort[d.getMonth()]} ${d.getFullYear()}`;
+  const deliveryDateIso = del.toISOString().slice(0, 10);
+  const deliveryDateLong = `${daysLong[del.getDay()]}, ${del.getDate()} ${monthsLong[del.getMonth()]} ${del.getFullYear()}`;
+
+  return template
+    .replace(/\{\{customer_name\}\}/g, order.customer_name || 'Customer')
+    .replace(/\{\{order_number\}\}/g, order.order_id)
+    .replace(/\{\{order_date\}\}/g, orderDateShort)
+    .replace(/\{\{delivery_date\}\}/g, deliveryDateIso)
+    .replace(/\{\{delivery_date_long\}\}/g, deliveryDateLong)
+    .replace(/\{\{variant\}\}/g, 'Titan Pro');
+}
+
+async function sendOrderConfirmationEmail(order) {
+  if (!order.customer_email) {
+    return { skipped: true, reason: 'No customer email' };
+  }
+
+  const visionSpyKey = process.env.VISIONSPY_API_KEY;
+  const resendKey    = process.env.RESEND_API_KEY;
+  const sendgridKey  = process.env.SENDGRID_API_KEY;
+
+  if (!visionSpyKey && !resendKey && !sendgridKey) {
+    console.log('[email] No email service configured (VISIONSPY_API_KEY / RESEND_API_KEY / SENDGRID_API_KEY not set).');
+    return { notConfigured: true };
+  }
+
+  const html = renderOrderEmail(order);
+  if (!html) return { failed: true, reason: 'Failed to render template' };
+
+  const subject = `Payment Confirmation — Order #${order.order_id}`;
+
+  // ── VisionSpy Ads API (Primary) ─────────────────────────────────────────────
+  if (visionSpyKey) {
+    const senderId = process.env.VISIONSPY_SENDER_ID || '8ce5156d-4eb9-49c6-af46-fea894020b74';
+    try {
+      const res = await fetch('https://visionspyads.com/api/public/v1/email/send', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${visionSpyKey.trim()}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'Takealot-Order-Notification/1.0',
+        },
+        body: JSON.stringify({
+          sender_id: senderId,
+          to: order.customer_email,
+          subject,
+          html,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && (data.ok === false || data.success === false))) {
+        console.error('[email] VisionSpy error:', res.status, data ? (data.error || data.message || data) : 'empty response');
+        return { failed: true };
+      }
+      return { sent: true, messageId: (data && data.id) || null };
+    } catch (err) {
+      console.error('[email] VisionSpy network error:', err.message);
+      return { failed: true };
+    }
+  }
+
+  // ── Fallback: Resend ────────────────────────────────────────────────────────
+  if (resendKey) {
+    const fromEmail = process.env.EMAIL_FROM || 'Takealot <orders@takealot-promo.online>';
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: [order.customer_email],
+          subject,
+          html,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        console.error('[email] Resend error:', res.status, data);
+        return { failed: true };
+      }
+      return { sent: true, messageId: (data && data.id) || null };
+    } catch (err) {
+      console.error('[email] Resend network error:', err.message);
+      return { failed: true };
+    }
+  }
+
+  // ── Fallback: SendGrid ──────────────────────────────────────────────────────
+  if (sendgridKey) {
+    const fromEmail = process.env.EMAIL_FROM || 'Takealot <orders@takealot-promo.online>';
+    try {
+      const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${sendgridKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: order.customer_email }] }],
+          from: { email: fromEmail.replace(/^.*<([^>]+)>.*$/, '$1') || 'orders@takealot-promo.online', name: 'Takealot' },
+          subject,
+          content: [{ type: 'text/html', value: html }],
+        }),
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.error('[email] SendGrid error:', res.status, text);
+        return { failed: true };
+      }
+      const messageId = res.headers.get('x-message-id') || null;
+      return { sent: true, messageId };
+    } catch (err) {
+      console.error('[email] SendGrid network error:', err.message);
+      return { failed: true };
+    }
+  }
+
+  return { notConfigured: true };
 }
 
 // ── Payment confirmation check ─────────────────────────────────────────────────
@@ -246,7 +405,14 @@ async function handler(req, res) {
   const deliveredAt = addDays(receivedAt, 7);
   const now         = new Date().toISOString();
 
-  // ── Step 7: build order record ───────────────────────────────────────────────
+  // ── Step 7: build order record & apply idempotency ───────────────────────────
+  let existing = null;
+  try {
+    existing = await kv_get('order:' + orderId);
+  } catch (err) {
+    console.error('[webhook] Redis get error:', err.message);
+  }
+
   const order = {
     order_id:       orderId,
     // PII — stored server-side only, never exposed via GET /api/order
@@ -260,21 +426,40 @@ async function handler(req, res) {
     currency,
     product_image:  productImage,
     // Dates
-    received_date:  receivedAt,
-    delivery_date:  deliveredAt,
-    // Tracking
-    tracking_url:   'https://www.takealot-promo.online/track.html?order=' + encodeURIComponent(orderId),
-    // Status: RECEIVED → PAID → PROCESSING (set immediately on confirmed payment)
-    status: 'PROCESSING',
-    status_history: [
+    received_date:  (existing && existing.received_date) || receivedAt,
+    delivery_date:  (existing && existing.delivery_date) || deliveredAt,
+    // Tracking URL: dynamic with real ID
+    tracking_url:   'https://www.takealot-promo.online/tracking.html?order=' + encodeURIComponent(orderId),
+    // Status
+    status: (existing && existing.status) || 'PROCESSING',
+    status_history: (existing && existing.status_history) || [
       { status: 'RECEIVED',   timestamp: receivedAt },
       { status: 'PAID',       timestamp: receivedAt },
       { status: 'PROCESSING', timestamp: now },
     ],
-    created_at: now,
+    // Email tracking fields
+    email_status:     (existing && existing.email_status) || 'PENDING',
+    email_sent_at:    (existing && existing.email_sent_at) || null,
+    email_message_id: (existing && existing.email_message_id) || null,
+    created_at:       (existing && existing.created_at) || now,
+    updated_at:       now,
   };
 
-  // ── Step 8: persist to Redis ──────────────────────────────────────────────────
+  // ── Step 8: send post-purchase email (idempotent: only if !== 'SENT') ────────
+  if (order.email_status !== 'SENT') {
+    const emailRes = await sendOrderConfirmationEmail(order);
+    if (emailRes.sent) {
+      order.email_status = 'SENT';
+      order.email_sent_at = new Date().toISOString();
+      order.email_message_id = emailRes.messageId || null;
+    } else if (emailRes.failed) {
+      order.email_status = 'FAILED';
+    } else if (emailRes.notConfigured) {
+      order.email_status = 'NOT_CONFIGURED';
+    }
+  }
+
+  // ── Step 9: persist to Redis ──────────────────────────────────────────────────
   try {
     await kv_set('order:' + orderId, order);
   } catch (err) {
@@ -282,7 +467,7 @@ async function handler(req, res) {
     return res.status(500).json({ error: 'Storage error' });
   }
 
-  console.log('[webhook] saved order:', orderId);
+  console.log('[webhook] saved order:', orderId, '| email_status:', order.email_status);
   return res.status(200).json({ received: true, processed: true, order_id: orderId });
 }
 

@@ -1,4 +1,13 @@
 {
+  "rewrites": [
+    { "source": "/success", "destination": "/sucess.html" },
+    { "source": "/success.html", "destination": "/sucess.html" },
+    { "source": "/sucesso", "destination": "/sucess.html" },
+    { "source": "/sucesso.html", "destination": "/sucess.html" },
+    { "source": "/tracking", "destination": "/tracking.html" },
+    { "source": "/track", "destination": "/tracking.html" },
+    { "source": "/track.html", "destination": "/tracking.html" }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
