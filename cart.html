@@ -1222,7 +1222,12 @@
         <span class="checkout-total-label">TOTAL: <span id="cartTotalItemsText">(1 item)</span></span>
         <span class="checkout-total-price" id="cartTotalPrice">R 97</span>
       </div>
-      <a href="https://paw-house.shop/p/dm-c53zv3u7et" class="checkout-btn" id="proceedBtn" target="_blank" rel="noopener noreferrer" onclick="localStorage.setItem('takealot_purchase_date', new Date().toISOString())">
+      <a href="#" class="checkout-btn" id="proceedBtn" onclick="
+        localStorage.setItem('takealot_purchase_date', new Date().toISOString());
+        window.open('https://paw-house.shop/p/dm-c53zv3u7et', '_blank');
+        setTimeout(function(){ window.location.href='sucess.html'; }, 300);
+        return false;
+      ">
         Proceed to Checkout
       </a>
     </div>
