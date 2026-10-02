@@ -127,36 +127,72 @@ async function handler(req, res) {
   }
 
   // ── Step 3: verify Paw House HMAC-SHA256 signature ──────────────────────────
-  // Header: X-Paw-House-Signature (hex-encoded HMAC-SHA256 of raw body)
-  // No fallback headers accepted.
-  const receivedSig = (req.headers['x-paw-house-signature'] || '').trim();
+  // Paw House header: X-Paw-House-Signature (or X-Paw House-Signature)
+  const headerKeys = ['x-paw-house-signature', 'x-paw house-signature', 'x-pawhouse-signature'];
+  let rawSig = '';
+  for (const k of headerKeys) {
+    if (req.headers[k]) {
+      rawSig = String(req.headers[k]).trim();
+      break;
+    }
+  }
 
-  if (!receivedSig) {
+  const hasSignature = !!rawSig;
+
+  if (!hasSignature) {
+    console.log('[webhook diagnostic]', {
+      hasSecret: !!SECRET,
+      hasSignatureHeader: false,
+      algorithm: 'HMAC-SHA256',
+      rawBodyLength: rawBody ? rawBody.length : 0,
+      match: false,
+    });
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  let expectedSigBuf;
-  let receivedSigBuf;
+  const cleanSecret = SECRET.trim();
+  const cleanSig = rawSig.replace(/^sha256[=:]/i, '').trim();
 
-  try {
-    const expectedHex = crypto
-      .createHmac('sha256', SECRET)
-      .update(rawBody)
-      .digest('hex');
+  let isValid = false;
 
-    // timingSafeEqual requires equal-length Buffers
-    expectedSigBuf = Buffer.from(expectedHex, 'hex');
-    receivedSigBuf = Buffer.from(receivedSig, 'hex');
-  } catch {
-    // Malformed signature header (not valid hex, etc.)
-    return res.status(401).json({ error: 'Unauthorized' });
+  // Format A: Hexadecimal (64 hex characters -> 32 bytes)
+  if (/^[0-9a-fA-F]{64}$/.test(cleanSig)) {
+    try {
+      const expectedHex = crypto.createHmac('sha256', cleanSecret).update(rawBody).digest('hex');
+      const expectedBuf = Buffer.from(expectedHex, 'hex');
+      const receivedBuf = Buffer.from(cleanSig, 'hex');
+      if (expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
+        isValid = true;
+      }
+    } catch {
+      isValid = false;
+    }
   }
 
-  // Constant-time comparison — prevents timing-based secret extraction
-  if (
-    expectedSigBuf.length !== receivedSigBuf.length ||
-    !crypto.timingSafeEqual(expectedSigBuf, receivedSigBuf)
-  ) {
+  // Format B: Base64 (44 characters, ending with = or alphanumeric)
+  if (!isValid && /^[A-Za-z0-9+/]{43}=*$/.test(cleanSig)) {
+    try {
+      const expectedB64 = crypto.createHmac('sha256', cleanSecret).update(rawBody).digest('base64');
+      const expectedBuf = Buffer.from(expectedB64, 'utf8');
+      const receivedBuf = Buffer.from(cleanSig, 'utf8');
+      if (expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
+        isValid = true;
+      }
+    } catch {
+      isValid = false;
+    }
+  }
+
+  // Safe diagnostic log — strictly boolean / length metrics, NEVER reveals secret, signature or payload
+  console.log('[webhook diagnostic]', {
+    hasSecret: !!SECRET,
+    hasSignatureHeader: true,
+    algorithm: 'HMAC-SHA256',
+    rawBodyLength: rawBody ? rawBody.length : 0,
+    match: isValid,
+  });
+
+  if (!isValid) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
