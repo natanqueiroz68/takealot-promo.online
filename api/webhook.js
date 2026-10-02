@@ -139,14 +139,12 @@ async function sendOrderConfirmationEmail(order) {
     return { skipped: true, reason: 'No customer email' };
   }
 
-  const visionSpyKey = process.env.VISIONSPY_API_KEY;
+  const visionSpyKey = process.env.VISIONSPY_API_KEY
+    || process.env.VISION_SPY_API_KEY
+    || process.env.VISIONSPY_KEY
+    || 'vs_live_931aac3659e6c3f0197a5e292333f126c117b2f699d3cea4';
   const resendKey    = process.env.RESEND_API_KEY;
   const sendgridKey  = process.env.SENDGRID_API_KEY;
-
-  if (!visionSpyKey && !resendKey && !sendgridKey) {
-    console.log('[email] No email service configured (VISIONSPY_API_KEY / RESEND_API_KEY / SENDGRID_API_KEY not set).');
-    return { notConfigured: true };
-  }
 
   const html = renderOrderEmail(order);
   if (!html) return { failed: true, reason: 'Failed to render template' };

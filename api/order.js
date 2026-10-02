@@ -13,7 +13,10 @@
 const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-// Upstash REST helper
+const fs = require('fs');
+const path = require('path');
+
+// Upstash REST helpers
 async function kv_get(key) {
   const res = await fetch(REDIS_URL, {
     method: 'POST',
@@ -27,6 +30,80 @@ async function kv_get(key) {
   const data = await res.json();
   if (!data.result) return null;
   try { return JSON.parse(data.result); } catch { return null; }
+}
+
+async function kv_set(key, value) {
+  const res = await fetch(REDIS_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${REDIS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(['SET', key, JSON.stringify(value)]),
+  });
+  if (!res.ok) throw new Error('Redis SET failed: ' + res.status);
+  return true;
+}
+
+// Self-healing email sender: if order exists but email wasn't sent yet, send it now
+async function ensureEmailSent(order) {
+  if (!order || order.email_status === 'SENT' || !order.customer_email) return;
+
+  const visionSpyKey = process.env.VISIONSPY_API_KEY
+    || process.env.VISION_SPY_API_KEY
+    || process.env.VISIONSPY_KEY
+    || 'vs_live_931aac3659e6c3f0197a5e292333f126c117b2f699d3cea4';
+  const senderId = process.env.VISIONSPY_SENDER_ID || '8ce5156d-4eb9-49c6-af46-fea894020b74';
+
+  let html = '';
+  try {
+    const template = fs.readFileSync(path.join(process.cwd(), 'email.index'), 'utf8');
+    const d = new Date(order.received_date || Date.now());
+    const del = new Date(order.delivery_date || (Date.now() + 7 * 86400000));
+    const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const daysLong = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const monthsLong = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const orderDateShort = `${daysShort[d.getDay()]}, ${d.getDate()} ${monthsShort[d.getMonth()]} ${d.getFullYear()}`;
+    const deliveryDateIso = del.toISOString().slice(0, 10);
+    const deliveryDateLong = `${daysLong[del.getDay()]}, ${del.getDate()} ${monthsLong[del.getMonth()]} ${del.getFullYear()}`;
+
+    html = template
+      .replace(/\{\{customer_name\}\}/g, order.customer_name || 'Customer')
+      .replace(/\{\{order_number\}\}/g, order.order_id)
+      .replace(/\{\{order_date\}\}/g, orderDateShort)
+      .replace(/\{\{delivery_date\}\}/g, deliveryDateIso)
+      .replace(/\{\{delivery_date_long\}\}/g, deliveryDateLong)
+      .replace(/\{\{variant\}\}/g, 'Titan Pro');
+  } catch (err) {
+    return;
+  }
+
+  try {
+    const res = await fetch('https://visionspyads.com/api/public/v1/email/send', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${visionSpyKey.trim()}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'Takealot-Order-Notification/1.0',
+      },
+      body: JSON.stringify({
+        sender_id: senderId,
+        to: order.customer_email,
+        subject: `Payment Confirmation — Order #${order.order_id}`,
+        html,
+      }),
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data && (data.ok !== false && data.success !== false)) {
+      order.email_status = 'SENT';
+      order.email_sent_at = new Date().toISOString();
+      order.email_message_id = (data && data.id) || null;
+      await kv_set('order:' + order.order_id, order).catch(() => {});
+    }
+  } catch (err) {
+    console.error('[order-email] error:', err.message);
+  }
 }
 
 // Only alphanumeric + dash + underscore, 4-80 chars
@@ -74,6 +151,10 @@ module.exports = async function handler(req, res) {
 
   if (!order) {
     return res.status(404).json({ error: 'Order not found', order_id: orderId });
+  }
+
+  if (order.email_status !== 'SENT') {
+    await ensureEmailSent(order);
   }
 
   return res.status(200).json(publicView(order));
