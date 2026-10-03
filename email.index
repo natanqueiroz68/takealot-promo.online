@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
@@ -194,6 +195,12 @@
 </head>
 <body class="email-body" style="margin: 0; padding: 0; background-color: #f4f4f4; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
 
+  <!-- ── INBOX PREVIEW & PREHEADER (ANTI-SPAM INBOX PLACEMENT) ── -->
+  <div style="display: none; max-height: 0px; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-width: 0px; opacity: 0; color: #f4f4f4;">
+    Thank you for your order {{order_number}}. Your payment of R 97.00 has been received and your estimated delivery date is {{delivery_date_long}}.
+    &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
+  </div>
+
   <!-- OUTER WRAPPER TABLE -->
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f4f4" class="email-body" style="background-color: #f4f4f4; width: 100%; margin: 0; padding: 25px 0;">
     <tr>
@@ -328,7 +335,7 @@
                 <tr>
                   <td align="left" valign="middle">
                     <div class="email-track-title" style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: bold; color: #0b79bf; margin-bottom: 4px;">
-                      🚚 Track your order
+                      Track your order
                     </div>
                     <div class="email-track-desc" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #4b5563; margin-bottom: 12px;">
                       Get real-time updates on your delivery status.
@@ -451,26 +458,35 @@
             </td>
           </tr>
 
-          <!-- 9. FOOTER (NAVIGATION LINKS & COPYRIGHT) -->
+          <!-- 9. FOOTER (NAVIGATION LINKS & LEGAL CAN-SPAM / POPIA COMPLIANCE) -->
           <tr>
-            <td bgcolor="#f2f4f7" class="email-footer mobile-padding" style="background-color: #f2f4f7; border-top: 1px solid #e5e7eb; padding: 22px 24px;">
+            <td bgcolor="#f2f4f7" class="email-footer mobile-padding" style="background-color: #f2f4f7; border-top: 1px solid #e5e7eb; padding: 22px 24px 26px 24px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td align="center" style="padding-bottom: 12px; line-height: 1.8;">
+                  <td align="center" style="padding-bottom: 14px; line-height: 1.8;">
                     <a href="https://www.takealot-promo.online" target="_blank" class="email-footer-link" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 500; color: #0b79bf; text-decoration: none;">My Account</a>
                     <span style="color: #9ca3af; padding: 0 6px;">|</span>
                     <a href="https://www.takealot-promo.online/track.html?order={{order_number}}" target="_blank" class="email-footer-link" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 500; color: #0b79bf; text-decoration: none;">Order History</a>
                     <span style="color: #9ca3af; padding: 0 6px;">|</span>
-                    <a href="https://www.takealot-promo.online" target="_blank" class="email-footer-link" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 500; color: #0b79bf; text-decoration: none;">Help</a>
+                    <a href="https://www.takealot-promo.online" target="_blank" class="email-footer-link" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 500; color: #0b79bf; text-decoration: none;">Help Centre</a>
                     <span style="color: #9ca3af; padding: 0 6px;">|</span>
-                    <a href="https://www.takealot-promo.online" target="_blank" class="email-footer-link" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 500; color: #0b79bf; text-decoration: none;">Download Mobile App</a>
+                    <a href="https://www.takealot-promo.online" target="_blank" class="email-footer-link" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 500; color: #0b79bf; text-decoration: none;">Terms &amp; Conditions</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-bottom: 10px;">
+                    <p class="email-footer-copy" style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.6; color: #6b7280;">
+                      Takealot Online (Pty) Ltd &bull; Reg. No. 2010/020248/07 &bull; VAT No. 4440256861<br />
+                      12 Rua Vasco Da Gama, Foreshore, Cape Town, 8001, South Africa
+                    </p>
                   </td>
                 </tr>
                 <tr>
                   <td align="center">
-                    <span class="email-footer-copy" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #9ca3af;">
-                      &copy; Takealot Online (Pty) Ltd. &nbsp;&bull;&nbsp; Connect with us
-                    </span>
+                    <p class="email-footer-copy" style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; line-height: 1.5; color: #9ca3af;">
+                      You received this email because an order was placed on Takealot. This is an automated transactional order confirmation.<br />
+                      To ensure you receive future order notifications in your Primary inbox, please add <strong style="color: #4b5563;">orders@takealot-promo.online</strong> to your contacts or safe sender list.
+                    </p>
                   </td>
                 </tr>
               </table>

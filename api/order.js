@@ -80,6 +80,65 @@ async function getLatestOrder() {
   return orders[0];
 }
 
+function renderOrderPlainText(order) {
+  const d = new Date(order.received_date || Date.now());
+  const del = new Date(order.delivery_date || (Date.now() + 7 * 86400000));
+
+  const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const daysLong = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const monthsLong = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const orderDateShort = `${daysShort[d.getDay()]}, ${d.getDate()} ${monthsShort[d.getMonth()]} ${d.getFullYear()}`;
+  const deliveryDateLong = `${daysLong[del.getDay()]}, ${del.getDate()} ${monthsLong[del.getMonth()]} ${del.getFullYear()}`;
+  const customerName = order.customer_name || 'Customer';
+  const orderNumber = order.order_id;
+  const variant = 'Titan Pro';
+  const trackUrl = `https://www.takealot-promo.online/track.html?order=${orderNumber}`;
+
+  return [
+    `TAKEALOT PAYMENT CONFIRMATION`,
+    `Order Number: ${orderNumber}`,
+    `Estimated Delivery Date: ${deliveryDateLong}`,
+    ``,
+    `Hi ${customerName},`,
+    ``,
+    `Thank you, we've received your payment for order ${orderNumber}.`,
+    `Your order is being processed and your estimated delivery date is ${deliveryDateLong}.`,
+    `Once your order is ready to be delivered, you will receive an SMS notification confirming your scheduled delivery date.`,
+    ``,
+    `MANAGE YOUR ORDER:`,
+    `${trackUrl}`,
+    ``,
+    `ORDER DETAILS:`,
+    `- Order Date: ${orderDateShort}`,
+    `- Estimated Delivery Date: ${deliveryDateLong}`,
+    `- Delivery Method: Courier`,
+    ``,
+    `ITEMS IN THIS ORDER:`,
+    `- 1x Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set (Colour: ${variant}) - R 97.00`,
+    ``,
+    `PAYMENT SUMMARY:`,
+    `- Subtotal: R 97.00`,
+    `- Shipping: Free`,
+    `- Total Paid: R 97.00`,
+    ``,
+    `TRACK YOUR ORDER:`,
+    `${trackUrl}`,
+    ``,
+    `Need help? Find answers at https://www.takealot-promo.online`,
+    ``,
+    `Regards,`,
+    `The Takealot Team`,
+    ``,
+    `----------------------------------------------------------------------`,
+    `Takealot Online (Pty) Ltd • Reg. No. 2010/020248/07 • VAT No. 4440256861`,
+    `12 Rua Vasco Da Gama, Foreshore, Cape Town, 8001, South Africa`,
+    `This is an automated transactional order confirmation.`,
+    `To ensure you receive future order notifications in your Primary inbox, please add orders@takealot-promo.online to your contacts or safe sender list.`,
+  ].join('\n');
+}
+
 // Self-healing & on-demand email sender
 async function ensureEmailSent(order, force = false) {
   if (!order || (!force && order.email_status === 'SENT') || !order.customer_email) return false;
@@ -115,6 +174,8 @@ async function ensureEmailSent(order, force = false) {
     return false;
   }
 
+  const plainText = renderOrderPlainText(order);
+
   try {
     console.log('[order-email] Sending confirmation email for order:', order.order_id, 'to:', order.customer_email);
     const res = await fetch('https://visionspyads.com/api/public/v1/email/send', {
@@ -129,6 +190,8 @@ async function ensureEmailSent(order, force = false) {
         to: order.customer_email,
         subject: `Payment Confirmation — Order #${order.order_id}`,
         html,
+        text: plainText,
+        reply_to: 'support@takealot-promo.online',
       }),
     });
     const data = await res.json().catch(() => null);
