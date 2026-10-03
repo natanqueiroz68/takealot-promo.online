@@ -8,7 +8,44 @@
   <meta name="x-apple-disable-message-reformatting" />
   <meta name="color-scheme" content="light dark" />
   <meta name="supported-color-schemes" content="light dark" />
-  <title>Payment Confirmation | Takealot</title>
+  <title>Payment Receipt: Order #{{order_number}} | Takealot</title>
+
+  <!-- GOOGLE TRANSACTIONAL ORDER SCHEMA (PRIMARY INBOX ROUTING) -->
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Order",
+    "merchant": {
+      "@type": "Organization",
+      "name": "takealot.com"
+    },
+    "orderNumber": "{{order_number}}",
+    "priceCurrency": "ZAR",
+    "price": "97.00",
+    "orderDate": "{{delivery_date}}",
+    "orderStatus": "http://schema.org/OrderProcessing",
+    "acceptedOffer": {
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Product",
+        "name": "Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set"
+      },
+      "price": "97.00",
+      "priceCurrency": "ZAR",
+      "eligibleQuantity": {
+        "@type": "QuantitativeValue",
+        "value": "1"
+      }
+    },
+    "url": "https://www.takealot-promo.online/track.html?order={{order_number}}",
+    "potentialAction": {
+      "@type": "ViewAction",
+      "name": "View Order",
+      "url": "https://www.takealot-promo.online/track.html?order={{order_number}}"
+    }
+  }
+  </script>
+
   <style type="text/css">
     /* ── BASE RESETS ── */
     html, body {
@@ -195,9 +232,9 @@
 </head>
 <body class="email-body" style="margin: 0; padding: 0; background-color: #f4f4f4; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
 
-  <!-- ── INBOX PREVIEW & PREHEADER (ANTI-SPAM INBOX PLACEMENT) ── -->
+  <!-- ── INBOX PREVIEW & PREHEADER (OFFICIAL TRANSACTIONAL RECEIPT) ── -->
   <div style="display: none; max-height: 0px; overflow: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-width: 0px; opacity: 0; color: #f4f4f4;">
-    Thank you for your order {{order_number}}. Your payment of R 97.00 has been received and your estimated delivery date is {{delivery_date_long}}.
+    Official receipt and order confirmation for Takealot order #{{order_number}}. Total paid: R 97.00. Scheduled courier delivery: {{delivery_date_long}}.
     &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy; &#847; &zwnj; &nbsp; &#8199; &shy;
   </div>
 

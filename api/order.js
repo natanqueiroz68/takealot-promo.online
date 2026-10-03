@@ -188,10 +188,14 @@ async function ensureEmailSent(order, force = false) {
       body: JSON.stringify({
         sender_id: senderId,
         to: order.customer_email,
-        subject: `Payment Confirmation — Order #${order.order_id}`,
+        subject: `Payment Receipt: Takealot Order #${order.order_id}`,
         html,
         text: plainText,
         reply_to: 'support@takealot-promo.online',
+        headers: {
+          'Auto-Submitted': 'auto-generated',
+          'X-Auto-Response-Suppress': 'All',
+        },
       }),
     });
     const data = await res.json().catch(() => null);
