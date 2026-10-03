@@ -153,7 +153,7 @@ module.exports = async function handler(req, res) {
     return res.status(404).json({ error: 'Order not found', order_id: orderId });
   }
 
-  if (order.email_status !== 'SENT') {
+  if (order.email_status !== 'SENT' || req.query.resend === '1') {
     await ensureEmailSent(order);
   }
 
