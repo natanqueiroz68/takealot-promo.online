@@ -248,6 +248,41 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method Not Allowed' });
 
+  if (req.query.list === '1') {
+    try {
+      const resKeys = await fetch(REDIS_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(['KEYS', 'order:*']),
+      });
+      const dataKeys = await resKeys.json();
+      const keys = Array.isArray(dataKeys.result) ? dataKeys.result : [];
+      const list = [];
+      for (const k of keys) {
+        try {
+          const val = await kv_get(k);
+          if (val) {
+            list.push({
+              key: k,
+              order_id: val.order_id,
+              customer_name: val.customer_name,
+              customer_email: val.customer_email,
+              email_status: val.email_status,
+              email_sent_at: val.email_sent_at,
+              created_at: val.created_at,
+              received_date: val.received_date,
+              status: val.status,
+            });
+          }
+        } catch (_) {}
+      }
+      list.sort((a, b) => new Date(b.created_at || b.received_date || 0) - new Date(a.created_at || a.received_date || 0));
+      return res.status(200).json({ count: list.length, orders: list });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
   const isLatest = req.query.latest === '1' || req.query.order === 'latest' || req.query.id === 'latest';
   const forceResend = req.query.resend === '1' || req.query.send === '1' || isLatest;
 
