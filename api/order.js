@@ -3,6 +3,7 @@
 // PII (email, phone, address) is NEVER returned.
 //
 // Usage: GET /api/order?id=T273493929180165
+//        GET /api/order?latest=1&resend=1
 //
 // Required env vars:
 //   UPSTASH_REDIS_REST_URL
@@ -45,9 +46,43 @@ async function kv_set(key, value) {
   return true;
 }
 
-// Self-healing email sender: if order exists but email wasn't sent yet, send it now
-async function ensureEmailSent(order) {
-  if (!order || order.email_status === 'SENT' || !order.customer_email) return;
+// Find the most recent order across all keys
+async function getLatestOrder() {
+  const res = await fetch(REDIS_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${REDIS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(['KEYS', 'order:*']),
+  });
+  if (!res.ok) throw new Error('Redis KEYS failed: ' + res.status);
+  const data = await res.json();
+  const keys = Array.isArray(data.result) ? data.result : [];
+  if (keys.length === 0) return null;
+
+  const orders = [];
+  for (const k of keys) {
+    try {
+      const ord = await kv_get(k);
+      if (ord && ord.order_id) orders.push(ord);
+    } catch (_) {}
+  }
+
+  if (orders.length === 0) return null;
+
+  orders.sort((a, b) => {
+    const da = new Date(a.created_at || a.received_date || 0).getTime();
+    const db = new Date(b.created_at || b.received_date || 0).getTime();
+    return db - da;
+  });
+
+  return orders[0];
+}
+
+// Self-healing & on-demand email sender
+async function ensureEmailSent(order, force = false) {
+  if (!order || (!force && order.email_status === 'SENT') || !order.customer_email) return false;
 
   const visionSpyKey = process.env.VISIONSPY_API_KEY
     || process.env.VISION_SPY_API_KEY
@@ -76,10 +111,12 @@ async function ensureEmailSent(order) {
       .replace(/\{\{delivery_date_long\}\}/g, deliveryDateLong)
       .replace(/\{\{variant\}\}/g, 'Titan Pro');
   } catch (err) {
-    return;
+    console.error('[order-email] render error:', err.message);
+    return false;
   }
 
   try {
+    console.log('[order-email] Sending confirmation email for order:', order.order_id, 'to:', order.customer_email);
     const res = await fetch('https://visionspyads.com/api/public/v1/email/send', {
       method: 'POST',
       headers: {
@@ -100,9 +137,15 @@ async function ensureEmailSent(order) {
       order.email_sent_at = new Date().toISOString();
       order.email_message_id = (data && data.id) || null;
       await kv_set('order:' + order.order_id, order).catch(() => {});
+      console.log('[order-email] Successfully sent to', order.customer_email);
+      return true;
+    } else {
+      console.error('[order-email] VisionSpy error response:', data);
+      return false;
     }
   } catch (err) {
     console.error('[order-email] error:', err.message);
+    return false;
   }
 }
 
@@ -122,6 +165,7 @@ function publicView(order) {
     tracking_url:   order.tracking_url,
     status:         order.status,
     email_status:   order.email_status || null,
+    email_sent_at:  order.email_sent_at || null,
     status_history: (order.status_history || []).map(function(e) {
       return { status: e.status, timestamp: e.timestamp };
     }),
@@ -137,25 +181,52 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const orderId = (req.query.order || req.query.id || req.query.orderId || '').trim();
-  if (!orderId) return res.status(400).json({ error: 'Missing ?order= parameter' });
-  if (!ORDER_ID_RE.test(orderId)) return res.status(400).json({ error: 'Invalid order id format' });
+  const isLatest = req.query.latest === '1' || req.query.order === 'latest' || req.query.id === 'latest';
+  const forceResend = req.query.resend === '1' || req.query.send === '1' || isLatest;
 
   let order;
-  try {
-    order = await kv_get('order:' + orderId);
-  } catch (err) {
-    console.error('[order] Redis error:', err.message);
-    return res.status(503).json({ error: 'Service temporarily unavailable' });
+  if (isLatest) {
+    try {
+      order = await getLatestOrder();
+    } catch (err) {
+      console.error('[order] Redis latest error:', err.message);
+      return res.status(503).json({ error: 'Storage read error' });
+    }
+    if (!order) return res.status(404).json({ error: 'No orders found in database' });
+  } else {
+    const orderId = (req.query.order || req.query.id || req.query.orderId || '').trim();
+    if (!orderId) return res.status(400).json({ error: 'Missing ?order= parameter' });
+    if (!ORDER_ID_RE.test(orderId)) return res.status(400).json({ error: 'Invalid order id format' });
+
+    try {
+      order = await kv_get('order:' + orderId);
+    } catch (err) {
+      console.error('[order] Redis error:', err.message);
+      return res.status(503).json({ error: 'Service temporarily unavailable' });
+    }
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found', order_id: orderId });
+    }
   }
 
-  if (!order) {
-    return res.status(404).json({ error: 'Order not found', order_id: orderId });
+  let sentResult = null;
+  if (order.email_status !== 'SENT' || forceResend) {
+    sentResult = await ensureEmailSent(order, true);
   }
 
-  if (order.email_status !== 'SENT' || req.query.resend === '1') {
-    await ensureEmailSent(order);
+  const responseData = publicView(order);
+  if (isLatest || forceResend) {
+    responseData.email_triggered = true;
+    responseData.email_sent_now = sentResult;
+    if (order.customer_email) {
+      const parts = order.customer_email.split('@');
+      responseData.recipient = parts[0].slice(0, 3) + '***@' + (parts[1] || '');
+    }
+    if (order.customer_name) {
+      responseData.customer_name = order.customer_name;
+    }
   }
 
-  return res.status(200).json(publicView(order));
+  return res.status(200).json(responseData);
 };
