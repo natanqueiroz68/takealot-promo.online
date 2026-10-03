@@ -273,6 +273,12 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  const overrideEmail = (req.query.to || req.query.email || '').trim();
+  if (overrideEmail && overrideEmail.includes('@')) {
+    order = Object.assign({}, order, { customer_email: overrideEmail });
+    if (req.query.name) order.customer_name = req.query.name.trim();
+  }
+
   let sentResult = null;
   if (order.email_status !== 'SENT' || forceResend) {
     sentResult = await ensureEmailSent(order, true);
