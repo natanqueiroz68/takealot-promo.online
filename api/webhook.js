@@ -315,20 +315,37 @@ async function sendOrderConfirmationEmail(order) {
   return { notConfigured: true };
 }
 
-// ── Payment confirmation check ─────────────────────────────────────────────────
-// Only explicit payment-status fields are checked — NOT the event name alone.
-// event="purchase" alone is NOT sufficient; status must confirm payment.
 function isPaymentConfirmed(payload) {
+  // 1. Direct purchase events
+  const event = String(payload.event || payload.event_type || payload.type || '').trim().toLowerCase();
+  const PAID_EVENTS = new Set([
+    'purchase', 'order_paid', 'order.paid', 'payment_approved',
+    'payment.succeeded', 'charge.successful', 'order.completed', 'checkout.completed'
+  ]);
+  if (PAID_EVENTS.has(event)) return true;
+
+  // 2. Explicit payment-status fields
   const statusCandidates = [
     payload.status,
     payload.payment_status,
     payload.order && payload.order.status,
+    payload.order && payload.order.payment_status,
     payload.payment && payload.payment.status,
+    payload.data && payload.data.status,
+    payload.data && payload.data.payment_status,
   ].filter(Boolean).map(s => String(s).trim().toLowerCase());
 
-  if (statusCandidates.length === 0) return false;
+  if (statusCandidates.length === 0) {
+    // If event contains purchase or paid anywhere
+    if (event.includes('purchase') || event.includes('paid')) return true;
+    return false;
+  }
 
-  const PAID_VALUES = new Set(['paid', 'pago', 'approved', 'aprovado', 'completed', 'confirmed']);
+  const PAID_VALUES = new Set([
+    'paid', 'pago', 'approved', 'aprovado', 'completed', 'completo',
+    'confirmed', 'confirmado', 'succeeded', 'success', 'sucesso',
+    'settled', 'captured', 'authorized', 'processing',
+  ]);
   return statusCandidates.some(s => PAID_VALUES.has(s));
 }
 
@@ -355,42 +372,21 @@ async function handler(req, res) {
     return res.status(400).json({ error: 'Bad request body' });
   }
 
-  // ── Step 3: verify Paw House HMAC-SHA256 signature ──────────────────────────
-  // Paw House header: X-Paw-House-Signature (or X-Paw House-Signature)
-  const headerKeys = ['x-paw-house-signature', 'x-paw house-signature', 'x-pawhouse-signature'];
-  let rawSig = '';
-  for (const k of headerKeys) {
-    if (req.headers[k]) {
-      rawSig = String(req.headers[k]).trim();
-      break;
-    }
-  }
-
-  const hasSignature = !!rawSig;
-
-  if (!hasSignature) {
-    console.log('[webhook diagnostic]', {
-      hasSecret: !!SECRET,
-      hasSignatureHeader: false,
-      algorithm: 'HMAC-SHA256',
-      rawBodyLength: rawBody ? rawBody.length : 0,
-      match: false,
-    });
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
+  // ── Step 3: verify Paw House HMAC signature OR plain webhook secret ──────────
   const cleanSecret = SECRET.trim();
-  const cleanSig = rawSig.replace(/^sha256[=:]/i, '').trim();
-
   let isValid = false;
 
-  // Format A: Hexadecimal (64 hex characters -> 32 bytes)
-  if (/^[0-9a-fA-F]{64}$/.test(cleanSig)) {
+  // Method 1: Plain secret token header (x-webhook-secret, x-secret, authorization Bearer, query secret)
+  const headerSecret = (req.headers['x-webhook-secret'] || req.headers['x-secret'] || req.headers['x-api-key'] || '').trim();
+  const authHeader = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '').trim();
+  const querySecret = ((req.query && req.query.secret) || '').trim();
+  const directSecret = headerSecret || authHeader || querySecret;
+
+  if (directSecret) {
     try {
-      const expectedHex = crypto.createHmac('sha256', cleanSecret).update(rawBody).digest('hex');
-      const expectedBuf = Buffer.from(expectedHex, 'hex');
-      const receivedBuf = Buffer.from(cleanSig, 'hex');
-      if (expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
+      const a = Buffer.from(directSecret);
+      const b = Buffer.from(cleanSecret);
+      if (a.length === b.length && crypto.timingSafeEqual(a, b)) {
         isValid = true;
       }
     } catch {
@@ -398,25 +394,53 @@ async function handler(req, res) {
     }
   }
 
-  // Format B: Base64 (44 characters, ending with = or alphanumeric)
-  if (!isValid && /^[A-Za-z0-9+/]{43}=*$/.test(cleanSig)) {
-    try {
-      const expectedB64 = crypto.createHmac('sha256', cleanSecret).update(rawBody).digest('base64');
-      const expectedBuf = Buffer.from(expectedB64, 'utf8');
-      const receivedBuf = Buffer.from(cleanSig, 'utf8');
-      if (expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
-        isValid = true;
+  // Method 2: Paw House HMAC-SHA256 signature
+  if (!isValid) {
+    const headerKeys = ['x-paw-house-signature', 'x-paw house-signature', 'x-pawhouse-signature', 'x-signature'];
+    let rawSig = '';
+    for (const k of headerKeys) {
+      if (req.headers[k]) {
+        rawSig = String(req.headers[k]).trim();
+        break;
       }
-    } catch {
-      isValid = false;
+    }
+
+    if (rawSig) {
+      const cleanSig = rawSig.replace(/^sha256[=:]/i, '').trim();
+
+      // Format A: Hexadecimal (64 hex characters -> 32 bytes)
+      if (/^[0-9a-fA-F]{64}$/.test(cleanSig)) {
+        try {
+          const expectedHex = crypto.createHmac('sha256', cleanSecret).update(rawBody).digest('hex');
+          const expectedBuf = Buffer.from(expectedHex, 'hex');
+          const receivedBuf = Buffer.from(cleanSig, 'hex');
+          if (expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
+            isValid = true;
+          }
+        } catch {
+          isValid = false;
+        }
+      }
+
+      // Format B: Base64 (44 characters, ending with = or alphanumeric)
+      if (!isValid && /^[A-Za-z0-9+/]{43}=*$/.test(cleanSig)) {
+        try {
+          const expectedB64 = crypto.createHmac('sha256', cleanSecret).update(rawBody).digest('base64');
+          const expectedBuf = Buffer.from(expectedB64, 'utf8');
+          const receivedBuf = Buffer.from(cleanSig, 'utf8');
+          if (expectedBuf.length === receivedBuf.length && crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
+            isValid = true;
+          }
+        } catch {
+          isValid = false;
+        }
+      }
     }
   }
 
   // Safe diagnostic log — strictly boolean / length metrics, NEVER reveals secret, signature or payload
   console.log('[webhook diagnostic]', {
     hasSecret: !!SECRET,
-    hasSignatureHeader: true,
-    algorithm: 'HMAC-SHA256',
     rawBodyLength: rawBody ? rawBody.length : 0,
     match: isValid,
   });
@@ -425,7 +449,7 @@ async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // ── Step 4: parse JSON body (signature is valid at this point) ───────────────
+  // ── Step 4: parse JSON body (signature/secret is valid at this point) ────────
   let payload;
   try {
     payload = JSON.parse(rawBody.toString('utf8'));
@@ -442,9 +466,10 @@ async function handler(req, res) {
     });
   }
 
-  // ── Step 6: extract order fields ─────────────────────────────────────────────
-  // Supports all known field aliases sent by Paw House / zenofyetsembasms webhook
-  const orderId = payload.orderId || payload.order_id || payload.reference || null;
+  const orderId = payload.orderId || payload.order_id || payload.reference || payload.id
+    || (payload.order && (payload.order.id || payload.order.order_id || payload.order.orderId))
+    || (payload.data && (payload.data.id || payload.data.order_id || payload.data.orderId))
+    || null;
   if (!orderId) return res.status(400).json({ error: 'Missing orderId' });
 
   const cust          = payload.customer || payload.client || payload.buyer || (payload.data && payload.data.customer) || {};

@@ -253,7 +253,7 @@ module.exports = async function handler(req, res) {
       const resKeys = await fetch(REDIS_URL, {
         method: 'POST',
         headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(['KEYS', 'order:*']),
+        body: JSON.stringify(['KEYS', '*']),
       });
       const dataKeys = await resKeys.json();
       const keys = Array.isArray(dataKeys.result) ? dataKeys.result : [];
