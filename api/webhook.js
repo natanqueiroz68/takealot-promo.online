@@ -35,19 +35,23 @@ const config = {
 // ── Raw body reader ────────────────────────────────────────────────────────────
 // Reads the request stream into a Buffer, respecting a 1 MB size limit.
 function readRawBody(req) {
-  // If raw body is already provided on req (e.g. by runtime or middleware)
+  // If raw body or parsed body is already provided on req
   if (Buffer.isBuffer(req.rawBody)) return Promise.resolve(req.rawBody);
   if (typeof req.rawBody === 'string') return Promise.resolve(Buffer.from(req.rawBody, 'utf8'));
   if (Buffer.isBuffer(req.body)) return Promise.resolve(req.body);
+  if (typeof req.body === 'string') return Promise.resolve(Buffer.from(req.body, 'utf8'));
+  if (req.body && typeof req.body === 'object') return Promise.resolve(Buffer.from(JSON.stringify(req.body), 'utf8'));
 
   // If stream has already finished or ended
   if (req.readableEnded || req.complete) {
-    if (typeof req.body === 'string') return Promise.resolve(Buffer.from(req.body, 'utf8'));
-    if (req.body && typeof req.body === 'object') return Promise.resolve(Buffer.from(JSON.stringify(req.body), 'utf8'));
     return Promise.resolve(Buffer.alloc(0));
   }
 
   return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      resolve(Buffer.alloc(0));
+    }, 4000);
+
     const MAX_BYTES = 1_048_576; // 1 MB
     const chunks = [];
     let totalBytes = 0;
@@ -55,6 +59,7 @@ function readRawBody(req) {
     req.on('data', (chunk) => {
       totalBytes += chunk.length;
       if (totalBytes > MAX_BYTES) {
+        clearTimeout(timeout);
         reject(new Error('Request body too large'));
         req.destroy();
         return;
@@ -62,8 +67,14 @@ function readRawBody(req) {
       chunks.push(chunk);
     });
 
-    req.on('end',   () => resolve(Buffer.concat(chunks)));
-    req.on('error', (err) => reject(err));
+    req.on('end', () => {
+      clearTimeout(timeout);
+      resolve(Buffer.concat(chunks));
+    });
+    req.on('error', (err) => {
+      clearTimeout(timeout);
+      reject(err);
+    });
   });
 }
 
@@ -310,6 +321,8 @@ async function sendOrderConfirmationEmail(order) {
       return { sent: true, messageId };
     } catch (err) {
       console.error('[email] SendGrid network error:', err.message);
+      return { failed: true };
+    }
   }
 
   return { notConfigured: true };
