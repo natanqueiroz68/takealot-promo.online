@@ -181,12 +181,12 @@ function renderOrderPlainText(order) {
     `- Delivery Method: Courier`,
     ``,
     `ITEMS IN THIS ORDER:`,
-    `- 1x Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set (Colour: ${variant}) - R 97.00`,
+    `- 1x Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set (Colour: ${variant}) - R 197.00`,
     ``,
     `PAYMENT SUMMARY:`,
-    `- Subtotal: R 97.00`,
+    `- Subtotal: R 197.00`,
     `- Shipping: Free`,
-    `- Total Paid: R 97.00`,
+    `- Total Paid: R 197.00`,
     ``,
     `TRACK YOUR ORDER:`,
     `${trackUrl}`,
@@ -500,7 +500,7 @@ async function handler(req, res) {
                     || 'Berlinger Haus 15-Piece Titan Pro Non-Stick Cookware Set';
   const productPrice = item.totalPrice != null
                     ? item.totalPrice
-                    : (item.price != null ? item.price : (payload.amount != null ? payload.amount : 97));
+                    : (item.price != null ? item.price : (payload.amount != null ? payload.amount : 197));
   const currency     = item.currency || payload.currency || 'ZAR';
 
   // Product image: per-product env var or default
